@@ -1,32 +1,42 @@
 import {TestState} from '../Shared/CustomTypes';
 
-export class TestClass {
-  readonly name: string;
-  private state: TestState;
-  private result: string;
-  readonly script: string;
-
-  constructor(name: string, script: string) {
-    this.name = name;
-    this.state = TestState.Ready;
-    this.result = 'not finished';
-    this.script = script;
+export class ReturnedTestClass implements ITestClass {
+  constructor(parameters: ITestClass) {
+    Object.assign(this, parameters);
+    this._state = TestState.Done;
   }
-
-  set setState(state: TestState) {
-    this.state = state;
+  getState(): TestState {
+    return this._state;
   }
-
-  get getState() {
-    console.log(this.state);
-    return this.state;
+  setState(state: TestState) {
+    this._state = state;
   }
+  readonly name = 'defname';
+  private _state = TestState.Done;
+  readonly result = 'defresult';
+  readonly script = 'defscript';
+}
 
-  set setResult(result: string) {
-    this.result = result;
+export class InitialTestClass implements ITestClass {
+  constructor(parameters: Pick<ITestClass, 'name' | 'script'>) {
+    Object.assign(this, parameters);
   }
+  getState(): TestState {
+    return this._state;
+  }
+  setState(state: TestState) {
+    this._state = state;
+  }
+  readonly name = 'defname';
+  private _state = TestState.Ready;
+  readonly result = 'defresult';
+  readonly script = 'defscript';
+}
 
-  get getResult() {
-    return this.result;
-  }
+export interface ITestClass {
+  name: string;
+  result: string;
+  script: string;
+  getState(): TestState;
+  setState(state: TestState): void;
 }

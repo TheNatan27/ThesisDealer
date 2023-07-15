@@ -4,7 +4,6 @@ import express from 'express';
 import ip from 'ip';
 import multer from 'multer';
 import {ILogic, Logic} from '../Logic/Logic';
-import {TestClass} from '../Repository/TestClass';
 
 export class DealerController {
   readonly endpoint = express();
@@ -30,35 +29,41 @@ export class DealerController {
     this.endpoint.use(bodyParser.json());
     this.endpoint.use(bodyParser.urlencoded({extended: true}));
 
-    this.endpoint.post('/startgame', async (request, response) => {
+    this.endpoint.post('/start-suite', async (request, response) => {
       const suiteId = this.logicLayer.startTestSuite();
       response.json({suiteId: suiteId});
     });
 
-    this.endpoint.get('/request-test/:gameID', async (request, response) => {
-      const testClass = this.logicLayer.requestTest(request.params.gameID);
+    this.endpoint.get('/request-test/:suiteID', async (request, response) => {
+      const testClass = await this.logicLayer.requestTest(
+        request.params.suiteID
+      );
       response.download(testClass.script);
       console.log(`Log: ${testClass.name} drawn`);
     });
 
     this.endpoint.post(
-      '/reveal-card/:gameID',
+      '/return-test/:suiteID',
       this.upload.single('result' as string),
       async (request, response) => {
-        const folderMessage = (await request.body) as TestClass;
-        console.log(`Log: reveived result card: ${folderMessage.name}`);
-
+        await this.logicLayer.returnTest(
+          await request.body,
+          request.params.suiteID
+        );
         response.json({received: 'ok'});
       }
     );
 
+    // DEBUG
     this.endpoint.post('/startgame-dev', async (request, response) => {
-      const gameId = await this.logicLayer.startTestSuite();
-      response.json({gameID: gameId});
+      const suiteID = await this.logicLayer.startTestSuite();
+      response.json({suiteID: suiteID});
     });
 
-    this.endpoint.get('/download/:gameID', async (request, response) => {
-      const testCard = await this.logicLayer.requestTest(request.params.gameID);
+    this.endpoint.get('/download/:suiteID', async (request, response) => {
+      const testCard = await this.logicLayer.requestTest(
+        request.params.suiteID
+      );
       response.download(testCard.script);
       console.log(`Log: ${testCard.name} drawn`);
     });
@@ -67,6 +72,7 @@ export class DealerController {
       console.log('debug received');
       response.json({debug: 'received', dirname: __dirname});
     });
+    // DEBUG
   }
 
   async startListening() {

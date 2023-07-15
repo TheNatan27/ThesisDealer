@@ -1,53 +1,51 @@
 import {TestState} from '../Shared/CustomTypes';
 import fs from 'fs';
-import {TestClass} from './TestClass';
+import {ITestClass, InitialTestClass} from './TestClass';
 import path from 'path';
 import {assert} from 'console';
 
 export class TestSuiteClass {
   readonly suiteId: string;
-  readonly testSet: TestClass[];
+  readonly testSet: ITestClass[];
 
   constructor(suiteId: string) {
     this.suiteId = suiteId;
     this.testSet = this.createTestSet();
   }
 
-  returnTest(testClass: TestClass) {
+  async returnTest(testClass: ITestClass) {
     const testIndex = this.findTestIndex({name: testClass.name});
-    if (testIndex !== -1) {
-      try {
-        assert(testClass.getState === TestState.Started);
-      } catch (error) {
-        console.error(error);
-      }
-      this.testSet[testIndex].setState = TestState.Done;
+    console.log('INDEX: ' + testIndex);
+    console.log('STATE: ' + testClass.getState());
+    try {
+      assert(testIndex !== -1, 'index failed');
+      assert(testClass.getState() === TestState.Done, 'state failed');
       this.saveToDatabase(testClass);
-    } else {
-      throw 'Test does not exits';
+    } catch (error) {
+      console.error(error);
     }
   }
 
-  saveToDatabase(testClass: TestClass) {
-    console.log(testClass.name + ' saved!');
-  }
-
-  drawTest() {
+  async drawTest(): Promise<ITestClass> {
     const testIndex = this.findTestIndex({state: TestState.Ready});
     if (testIndex !== -1) {
-      this.testSet[testIndex].setState = TestState.Started;
+      this.testSet[testIndex].setState(TestState.Started);
       return this.testSet[testIndex];
     } else {
       throw 'No more tests available';
     }
   }
 
-  findTestIndex(options: {state?: TestState; name?: string}) {
+  private saveToDatabase(testClass: ITestClass) {
+    console.log('Log: ' + testClass.name + ' saved!');
+  }
+
+  private findTestIndex(options: {state?: TestState; name?: string}) {
     if (options.name !== undefined) {
       return this.testSet.findIndex(test => test.name === options.name);
     }
     if (options.state !== undefined) {
-      return this.testSet.findIndex(test => test.getState === options.state);
+      return this.testSet.findIndex(test => test.getState() === options.state);
     }
     throw 'Didnt give filter';
   }
@@ -56,7 +54,8 @@ export class TestSuiteClass {
     const currentFiles = this.gatherTestFiles();
     console.log('TESTS ARE CREATED');
     return currentFiles.map(
-      file => new TestClass(file, this.readTestFile(file))
+      file =>
+        new InitialTestClass({name: file, script: this.readTestFile(file)})
     );
   }
 
