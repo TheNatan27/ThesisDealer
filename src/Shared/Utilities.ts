@@ -1,6 +1,7 @@
 import {Client} from 'ts-postgres';
+import {ITestClass, QueryTestClass} from '../Repository/TestClass';
 
-export default async function readSuite(uuid: string) {
+export async function readSuite(uuid: string) {
   const client = new Client({
     user: 'postgres',
     password: 'adminu',
@@ -22,4 +23,8 @@ export default async function readSuite(uuid: string) {
     console.error(error);
   }
 }
-ú;
+
+export async function processResults(testClass: ITestClass, uuid: string) {
+  console.log('bruh');
+  const data = new QueryTestClass({testClass, suiteId: uuid});
+}
