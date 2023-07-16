@@ -35,8 +35,6 @@ export class Logic implements ILogic {
   async returnTest(data: ITestClass, guid: string) {
     const selectedSuite = await this.selectTestSuite(guid);
     const testClass = new ReturnedTestClass(data);
-    console.log(JSON.stringify(testClass));
-    console.log(testClass.getState());
     await selectedSuite.returnTest(testClass);
   }
 
