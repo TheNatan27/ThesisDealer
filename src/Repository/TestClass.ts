@@ -3,16 +3,16 @@ import {TestState} from '../Shared/CustomTypes';
 export class ReturnedTestClass implements ITestClass {
   constructor(parameters: ITestClass) {
     Object.assign(this, parameters);
-    this._state = TestState.Done;
+    this.state = TestState.Done;
   }
   getState(): TestState {
-    return this._state;
+    return this.state;
   }
   setState(state: TestState) {
-    this._state = state;
+    this.state = state;
   }
   readonly name = 'defname';
-  private _state = TestState.Done;
+  private state = TestState.Done;
   readonly result = 'defresult';
   readonly script = 'defscript';
 }
@@ -22,13 +22,33 @@ export class InitialTestClass implements ITestClass {
     Object.assign(this, parameters);
   }
   getState(): TestState {
-    return this._state;
+    return this.state;
   }
   setState(state: TestState) {
-    this._state = state;
+    this.state = state;
   }
   readonly name = 'defname';
-  private _state = TestState.Ready;
+  private state = TestState.Ready;
+  readonly result = 'defresult';
+  readonly script = 'defscript';
+}
+
+export class QueryTestClass implements ITestClass {
+  constructor(parameters: {testClass: ITestClass; suiteId: string}) {
+    Object.assign(this, parameters.testClass);
+    this.suite_id = parameters.suiteId;
+    this.timestamp = Date.now();
+  }
+  getState(): TestState {
+    return this.state;
+  }
+  setState(state: TestState) {
+    this.state = state;
+  }
+  readonly timestamp: number;
+  readonly suite_id: string;
+  readonly name = 'defname';
+  private state = TestState.Done;
   readonly result = 'defresult';
   readonly script = 'defscript';
 }

@@ -3,6 +3,7 @@ import fs from 'fs';
 import {ITestClass, InitialTestClass} from './TestClass';
 import path from 'path';
 import {assert} from 'console';
+import {processResults} from '../Shared/Utilities';
 
 export class TestSuiteClass {
   readonly suiteId: string;
@@ -36,8 +37,9 @@ export class TestSuiteClass {
     }
   }
 
-  private saveToDatabase(testClass: ITestClass) {
+  private async saveToDatabase(testClass: ITestClass) {
     console.log('Log: ' + testClass.name + ' saved!');
+    await processResults(testClass, this.suiteId);
   }
 
   private findTestIndex(options: {state?: TestState; name?: string}) {

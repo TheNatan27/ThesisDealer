@@ -4,7 +4,6 @@ import express from 'express';
 import ip from 'ip';
 import multer from 'multer';
 import {ILogic, Logic} from '../Logic/Logic';
-import {PostgresController} from '../Shared/Utilities';
 
 export class DealerController {
   readonly endpoint = express();
@@ -70,9 +69,6 @@ export class DealerController {
     });
 
     this.endpoint.get('/debug', async (request, response) => {
-      const pc = new PostgresController();
-      await pc.connectToClient();
-      await pc.readSuite('de4528f8-c495-4d28-9ae4-333a1decb4bc');
       response.json({received: 'ok'});
     });
     // DEBUG
