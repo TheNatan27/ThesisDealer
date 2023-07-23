@@ -13,7 +13,7 @@ export class ReturnedTestClass implements ITestClass {
   }
   readonly name = 'defname';
   private state = TestState.Done;
-  readonly result = 'defresult';
+  readonly result = "{hello: 'world'}";
   readonly script = 'defscript';
 }
 
@@ -37,7 +37,6 @@ export class QueryTestClass implements ITestClass {
   constructor(parameters: {testClass: ITestClass; suiteId: string}) {
     Object.assign(this, parameters.testClass);
     this.suite_id = parameters.suiteId;
-    this.timestamp = Date.now();
   }
   getState(): TestState {
     return this.state;
@@ -45,7 +44,6 @@ export class QueryTestClass implements ITestClass {
   setState(state: TestState) {
     this.state = state;
   }
-  readonly timestamp: number;
   readonly suite_id: string;
   readonly name = 'defname';
   private state = TestState.Done;

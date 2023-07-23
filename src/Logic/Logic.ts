@@ -1,8 +1,7 @@
 /* eslint-disable @typescript-eslint/no-namespace */
-import {assert} from 'console';
 import {ITestClass, ReturnedTestClass} from '../Repository/TestClass';
 import {TestSuiteClass} from '../Repository/TestSuiteClass';
-import {TestState} from '../Shared/CustomTypes';
+import {PostgresConnector} from '../Shared/PostgresConnector';
 
 export interface ILogic {
   startTestSuite(): string;
@@ -16,9 +15,11 @@ export interface ILogic {
 
 export class Logic implements ILogic {
   readonly testRunRepository: Array<TestSuiteClass>;
+  readonly postgresConnector: PostgresConnector;
 
   constructor() {
     this.testRunRepository = new Array<TestSuiteClass>();
+    this.postgresConnector = new PostgresConnector();
   }
 
   startTestSuite(): string {
@@ -35,7 +36,7 @@ export class Logic implements ILogic {
   async returnTest(data: ITestClass, guid: string) {
     const selectedSuite = await this.selectTestSuite(guid);
     const testClass = new ReturnedTestClass(data);
-    await selectedSuite.returnTest(testClass);
+    await selectedSuite.returnTest(testClass, this.postgresConnector);
   }
 
   private async selectTestSuite(guid: string) {
