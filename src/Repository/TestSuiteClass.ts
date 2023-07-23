@@ -4,7 +4,7 @@ import {ITestClass, InitialTestClass} from './TestClass';
 import path from 'path';
 import {assert} from 'console';
 import {processResults} from '../Shared/Utilities';
-import {PostgresConnector} from '../Shared/PostgresConnector';
+import PostgresConnector from '../Shared/PostgresConnector';
 
 export class TestSuiteClass {
   readonly suiteId: string;
@@ -15,14 +15,14 @@ export class TestSuiteClass {
     this.testSet = this.createTestSet();
   }
 
-  async returnTest(testClass: ITestClass, connector: PostgresConnector) {
+  async returnTest(testClass: ITestClass) {
     const testIndex = this.findTestIndex({name: testClass.name});
     console.log('INDEX: ' + testIndex);
     console.log('STATE: ' + testClass.getState());
     try {
       assert(testIndex !== -1, 'index failed');
       assert(testClass.getState() === TestState.Done, 'state failed');
-      this.saveToDatabase(testClass, connector);
+      this.saveToDatabase(testClass);
     } catch (error) {
       console.error(error);
     }
@@ -38,12 +38,9 @@ export class TestSuiteClass {
     }
   }
 
-  private async saveToDatabase(
-    testClass: ITestClass,
-    connector: PostgresConnector
-  ) {
+  private async saveToDatabase(testClass: ITestClass) {
     console.log('Log: ' + testClass.name + ' saved!');
-    await processResults(testClass, this.suiteId, connector);
+    await processResults(testClass, this.suiteId);
   }
 
   private findTestIndex(options: {state?: TestState; name?: string}) {

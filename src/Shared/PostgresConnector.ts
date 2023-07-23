@@ -1,7 +1,7 @@
 import {Client} from 'ts-postgres';
 import {QueryTestClass} from '../Repository/TestClass';
 
-export class PostgresConnector {
+class PostgresConnector {
   private client: Client;
   private isConnected: boolean;
 
@@ -18,6 +18,7 @@ export class PostgresConnector {
     if (!this.isConnected) {
       await this.client.connect();
       this.isConnected = true;
+      console.log('CONNECTED!')
     }
   }
 
@@ -28,7 +29,7 @@ export class PostgresConnector {
 
     try {
       const result = this.client.query(
-        'INSERT INTO test_results VALUES $1 $2 $3 $4',
+        'INSERT INTO test_results VALUES ($1, $2, $3, $4)',
         [[data.name, data.result, data.getState(), data.suite_id]]
       );
 
@@ -40,3 +41,20 @@ export class PostgresConnector {
     }
   }
 }
+
+class GlobalConnection {
+  private static _postgresConnector: PostgresConnector;
+
+  private constructor () {}
+
+  static getInstance() {
+    if (this._postgresConnector) {
+      return this._postgresConnector;
+    }
+
+    this._postgresConnector = new PostgresConnector();
+    return this._postgresConnector;
+  }
+}
+
+export default GlobalConnection;
