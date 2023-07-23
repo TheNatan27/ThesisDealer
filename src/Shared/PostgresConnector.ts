@@ -9,7 +9,7 @@ class PostgresConnector {
     this.client = new Client({
       user: 'postgres',
       password: 'adminu',
-      database: 'Canasta-Results',
+      database: 'postgres',
     });
     this.isConnected = false;
   }
@@ -18,7 +18,7 @@ class PostgresConnector {
     if (!this.isConnected) {
       await this.client.connect();
       this.isConnected = true;
-      console.log('CONNECTED!')
+      console.log('CONNECTED!');
     }
   }
 
@@ -29,8 +29,8 @@ class PostgresConnector {
 
     try {
       const result = this.client.query(
-        'INSERT INTO test_results VALUES ($1, $2, $3, $4)',
-        [[data.name, data.result, data.getState(), data.suite_id]]
+        'INSERT INTO testresults VALUES ($1, $2, $3, $4);',
+        [[data.test_id, data.suite_id, data.name, data.result]]
       );
 
       for await (const row of result) {
@@ -45,7 +45,7 @@ class PostgresConnector {
 class GlobalConnection {
   private static _postgresConnector: PostgresConnector;
 
-  private constructor () {}
+  private constructor() {}
 
   static getInstance() {
     if (this._postgresConnector) {

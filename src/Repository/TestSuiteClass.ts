@@ -4,7 +4,6 @@ import {ITestClass, InitialTestClass} from './TestClass';
 import path from 'path';
 import {assert} from 'console';
 import {processResults} from '../Shared/Utilities';
-import PostgresConnector from '../Shared/PostgresConnector';
 
 export class TestSuiteClass {
   readonly suiteId: string;

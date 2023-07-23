@@ -6,6 +6,5 @@ import {
 } from './Repository/TestClass';
 import {TestState} from './Shared/CustomTypes';
 
-
 const controller = new DealerController();
 controller.startListening();
