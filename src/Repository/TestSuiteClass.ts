@@ -14,14 +14,11 @@ export class TestSuiteClass {
     this.testSet = this.createTestSet();
   }
 
-  async returnTest(testClass: ITestClass) {
-    const testIndex = this.findTestIndex({name: testClass.name});
-    console.log('INDEX: ' + testIndex);
-    console.log('STATE: ' + testClass.getState());
+  async returnTest(result: string, testId: string) {
+    const testIndex = this.findTestIndex({testId});
     try {
       assert(testIndex !== -1, 'index failed');
-      assert(testClass.getState() === TestState.Done, 'state failed');
-      this.saveToDatabase(testClass);
+      await processResults(this.testSet[testIndex], result, this.suiteId);
     } catch (error) {
       console.error(error);
     }
@@ -37,17 +34,15 @@ export class TestSuiteClass {
     }
   }
 
-  private async saveToDatabase(testClass: ITestClass) {
-    console.log('Log: ' + testClass.name + ' saved!');
-    await processResults(testClass, this.suiteId);
-  }
-
-  private findTestIndex(options: {state?: TestState; name?: string}) {
+  private findTestIndex(options: {state?: TestState; name?: string, testId?: string}) {
     if (options.name !== undefined) {
       return this.testSet.findIndex(test => test.name === options.name);
     }
     if (options.state !== undefined) {
       return this.testSet.findIndex(test => test.getState() === options.state);
+    }
+    if (options.testId !== undefined) {
+      return this.testSet.findIndex(test => test.test_id === options.testId);
     }
     throw 'Didnt give filter';
   }

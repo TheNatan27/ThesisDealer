@@ -38,9 +38,10 @@ export class ReturnedTestClass implements ITestClass {
 }
 
 export class QueryTestClass implements ITestClass {
-  constructor(parameters: {testClass: ITestClass; suiteId: string}) {
+  constructor(parameters: {testClass: ITestClass; suiteId: string, parsedResult: string}) {
     Object.assign(this, parameters.testClass);
     this.suite_id = parameters.suiteId;
+    this.result = parameters.parsedResult
   }
   getState(): TestState {
     return this.state;
@@ -52,7 +53,7 @@ export class QueryTestClass implements ITestClass {
   readonly suite_id: string;
   readonly name = 'defname';
   private state = TestState.Done;
-  readonly result = 'defresult';
+  readonly result: string;
   readonly script = 'defscript';
 }
 
@@ -60,7 +61,7 @@ export class DebugTestClass implements ITestClass {
   name = 'debug.spec.ts';
   result = 'passed';
   script = 'hello script';
-  test_id = '12345678-abcd-46d2-aada-g5hjkl1234de';
+  test_id = uuid();
   suite_id = '00000000-abcd-46d2-pppp-o2hjkl9999de';
   state = TestState.Done;
   getState(): TestState {

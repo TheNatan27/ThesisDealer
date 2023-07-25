@@ -7,7 +7,7 @@ import {v4 as uuid} from 'uuid'
 export interface ILogic {
   startTestSuite(): string;
   requestTest(suiteId: string): Promise<ITestClass>;
-  returnTest(data: ITestClass, suiteId: string): Promise<void>;
+  returnTest(result: string, suiteId: string, testId: string): Promise<void>;
 
   readonly testRunRepository: Array<TestSuiteClass>;
 }
@@ -33,10 +33,8 @@ export class Logic implements ILogic {
     return await selectedSuite.drawTest();
   }
 
-  async returnTest(data: ITestClass, suiteId: string) {
-    const selectedSuite = await this.selectTestSuite(suiteId);
-    const testClass = new ReturnedTestClass(data);
-    await selectedSuite.returnTest(testClass);
+  async returnTest(result: string, suiteId: string, testId: string) {
+    await (await this.selectTestSuite(suiteId)).returnTest(result, testId);
   }
 
   private async selectTestSuite(suiteId: string) {
