@@ -1,8 +1,8 @@
 /* eslint-disable @typescript-eslint/no-namespace */
 import {ITestClass, ReturnedTestClass} from '../Repository/TestClass';
 import {TestSuiteClass} from '../Repository/TestSuiteClass';
-import GlobalConnection from '../Shared/PostgresConnector';
-import {v4 as uuid} from 'uuid'
+import {v4 as uuid} from 'uuid';
+import assert from 'assert';
 
 export interface ILogic {
   startTestSuite(): string;
@@ -43,16 +43,7 @@ export class Logic implements ILogic {
     const selectedSuite = this.testRunRepository.find(
       suite => suite.suiteId === suiteId
     );
-    return this.undefinedCheck(selectedSuite);
-  }
-
-  undefinedCheck<T>(
-    argument: T | undefined | null,
-    message = 'Undefined result'
-  ) {
-    if (argument === undefined || argument === null) {
-      throw new TypeError(message);
-    }
-    return argument;
+    assert(selectedSuite !== undefined);
+    return selectedSuite;
   }
 }
