@@ -1,7 +1,21 @@
-import {ITestClass, QueryTestClass} from '../Repository/TestClass';
 import PostgresConnector from './PostgresConnector';
+import {
+  InitialTestType,
+  ProcessedTestType,
+  processedTestSchema,
+} from './TestClassTypes';
 
-export async function processResults(testClass: ITestClass, uuid: string) {
-  const data = new QueryTestClass({testClass, suiteId: uuid});
-  await PostgresConnector.getInstance().insertTestResult(data);
+export async function processResults(
+  testClass: InitialTestType,
+  result: string,
+  uuid: string
+) {
+  const processedTest: ProcessedTestType = processedTestSchema.parse({
+    testClass,
+    result: result,
+    suite_id: uuid,
+  });
+  await PostgresConnector.getInstance().insertTestResult(processedTest);
 }
+
+// TODO private fuggvany amiben feldolgozzuk a resultot

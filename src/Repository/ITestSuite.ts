@@ -1,6 +1,6 @@
-import {TestObject} from '../Shared/CustomTypes';
+import {ProcessedTestType} from '../Shared/TestClassTypes';
 
 export interface ITestSuite {
   suiteId: string;
-  testSet: TestObject[];
+  testSet: ProcessedTestType[];
 }

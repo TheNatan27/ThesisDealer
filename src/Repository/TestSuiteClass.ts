@@ -1,43 +1,49 @@
-import {TestState} from '../Shared/CustomTypes';
 import fs from 'fs';
-import {ITestClass, InitialTestClass} from './TestClass';
 import path from 'path';
 import assert from 'assert';
+import {v4 as uuid} from 'uuid';
 import {processResults} from '../Shared/Utilities';
+import {
+  initialTestSchema,
+  InitialTestType,
+  processedTestSchema,
+  ReturnedTestType,
+} from '../Shared/TestClassTypes';
 
 export class TestSuiteClass {
   readonly suiteId: string;
-  readonly testSet: ITestClass[];
+  readonly testSet: Array<InitialTestType>;
 
   constructor(suiteId: string) {
     this.suiteId = suiteId;
     this.testSet = this.createTestSet();
   }
 
-  async returnTest(testClass: ITestClass) {
-    const foundTest = this.testSet.find(test => test.name === testClass.name);
+  async returnTest(result: string, testId: string) {
+    const foundTest = this.testSet.find(test => test.test_id === testId);
     assert(foundTest !== undefined);
-    assert(foundTest.getState() === TestState.Done);
-    this.saveToDatabase(testClass);
+    this.saveToDatabase(foundTest, result);
   }
 
-  async drawTest() {
-    const foundTest = this.testSet.find(
-      test => test.getState() === TestState.Done
-    );
+  drawTest() {
+    const foundTest = this.testSet.find(test => test.state === 'done');
     assert(foundTest !== undefined);
     return foundTest;
   }
 
-  private async saveToDatabase(testClass: ITestClass) {
-    await processResults(testClass, this.suiteId);
+  private async saveToDatabase(testClass: InitialTestType, result: string) {
+    await processResults(testClass, result, this.suiteId);
   }
 
   private createTestSet() {
     const currentFiles = this.gatherTestFiles();
-    return currentFiles.map(
-      file =>
-        new InitialTestClass({name: file, script: this.readTestFile(file)})
+    return currentFiles.map(file =>
+      initialTestSchema.parse({
+        name: file,
+        script: this.readTestFile(file),
+        test_id: uuid(),
+        state: 'ready',
+      })
     );
   }
 

@@ -1,12 +1,12 @@
 /* eslint-disable @typescript-eslint/no-namespace */
-import {ITestClass, ReturnedTestClass} from '../Repository/TestClass';
 import {TestSuiteClass} from '../Repository/TestSuiteClass';
 import {v4 as uuid} from 'uuid';
 import assert from 'assert';
+import {InitialTestType} from '../Shared/TestClassTypes';
 
 export interface ILogic {
   startTestSuite(): string;
-  requestTest(suiteId: string): Promise<ITestClass>;
+  requestTest(suiteId: string): Promise<InitialTestType>;
   returnTest(result: string, suiteId: string, testId: string): Promise<void>;
 
   readonly testRunRepository: Array<TestSuiteClass>;
@@ -30,11 +30,12 @@ export class Logic implements ILogic {
 
   async requestTest(suiteId: string) {
     const selectedSuite = await this.selectTestSuite(suiteId);
-    return await selectedSuite.drawTest();
+    return selectedSuite.drawTest();
   }
 
   async returnTest(result: string, suiteId: string, testId: string) {
-    await (await this.selectTestSuite(suiteId)).returnTest(result, testId);
+    const selectedSuite = await this.selectTestSuite(suiteId);
+    await selectedSuite.returnTest(result, testId);
   }
 
   private async selectTestSuite(suiteId: string) {

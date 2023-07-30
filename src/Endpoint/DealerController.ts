@@ -5,8 +5,7 @@ import ip from 'ip';
 import multer from 'multer';
 import {ILogic, Logic} from '../Logic/Logic';
 import GlobalConnection from '../Shared/PostgresConnector';
-import {DebugTestClass, QueryTestClass} from '../Repository/TestClass';
-import {v4 as uuid} from 'uuid'
+import {v4 as uuid} from 'uuid';
 
 export class DealerController {
   readonly endpoint = express();
@@ -42,7 +41,7 @@ export class DealerController {
         request.params.suiteID
       );
       response.download(testClass.script);
-      response.json({testID: testClass.test_id})
+      response.json({testID: testClass.test_id});
       console.log(`Log: ${testClass.name} drawn`);
     });
 
@@ -74,13 +73,6 @@ export class DealerController {
     });
 
     this.endpoint.get('/debug', async (request, response) => {
-      const debug = new DebugTestClass();
-      const data = new QueryTestClass({
-        testClass: debug,
-        suiteId: uuid(),
-        parsedResult: 'tobeimplemented'
-      });
-      GlobalConnection.getInstance().insertTestResult(data);
       response.json({received: 'ok'});
     });
     // DEBUG
