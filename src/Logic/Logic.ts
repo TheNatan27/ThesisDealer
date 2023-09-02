@@ -1,12 +1,13 @@
 /* eslint-disable @typescript-eslint/no-namespace */
-import {ITestClass, ReturnedTestClass} from '../Repository/TestClass';
 import {TestSuiteClass} from '../Repository/TestSuiteClass';
 import {v4 as uuid} from 'uuid';
 import assert from 'assert';
+import {createDeployment, removeDeployment} from '../Shared/DockerConnector';
 
 export interface ILogic {
-  startTestSuite(): string;
-  requestTest(suiteId: string): Promise<ITestClass>;
+  startTestSuite(): Promise<string>;
+  reserveTest(suite: string): Promise<string>;
+  requestTest(suiteId: string, testId: string): Promise<string>;
   returnTest(result: string, suiteId: string, testId: string): Promise<void>;
 
   readonly testRunRepository: Array<TestSuiteClass>;
@@ -21,20 +22,33 @@ export class Logic implements ILogic {
     this.testRunRepository = new Array<TestSuiteClass>();
   }
 
-  startTestSuite(): string {
+  // Workflow:
+  // 1. startTestSuite creates a new testSuite, then starts the docker deployment with the new suite id
+  // 2. docker workers first reserve a testid with the suite id, then download the script with the testid
+  // 3. the workers return the result with the suite and test id
+
+  async startTestSuite(): Promise<string> {
     const suiteId = uuid();
-    const newTestSuiteClass = new TestSuiteClass(suiteId);
+    const dockerId = uuid();
+    const newTestSuiteClass = new TestSuiteClass(suiteId, dockerId);
     this.testRunRepository.push(newTestSuiteClass);
+    await createDeployment(suiteId, dockerId);
     return suiteId;
   }
 
-  async requestTest(suiteId: string) {
+  async reserveTest(suiteId: string) {
     const selectedSuite = await this.selectTestSuite(suiteId);
-    return await selectedSuite.drawTest();
+    return await selectedSuite.reserveTestId();
+  }
+
+  async requestTest(suiteId: string, testId: string) {
+    const selectedSuite = await this.selectTestSuite(suiteId);
+    return await selectedSuite.drawTest(testId);
   }
 
   async returnTest(result: string, suiteId: string, testId: string) {
-    await (await this.selectTestSuite(suiteId)).returnTest(result, testId);
+    const selectedSuite = await this.selectTestSuite(suiteId);
+    await selectedSuite.returnTest(testId, result);
   }
 
   private async selectTestSuite(suiteId: string) {

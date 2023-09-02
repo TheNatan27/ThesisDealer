@@ -38,10 +38,14 @@ export class ReturnedTestClass implements ITestClass {
 }
 
 export class QueryTestClass implements ITestClass {
-  constructor(parameters: {testClass: ITestClass; suiteId: string, parsedResult: string}) {
+  constructor(parameters: {
+    testClass: ITestClass;
+    suiteId: string;
+    parsedResult: string;
+  }) {
     Object.assign(this, parameters.testClass);
     this.suite_id = parameters.suiteId;
-    this.result = parameters.parsedResult
+    this.result = parameters.parsedResult;
   }
   getState(): TestState {
     return this.state;

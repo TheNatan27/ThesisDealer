@@ -1,12 +1,12 @@
 import bodyParser from 'body-parser';
 import cors from 'cors';
-import express from 'express';
+import express, {NextFunction, Request, Response} from 'express';
 import ip from 'ip';
 import multer from 'multer';
 import {ILogic, Logic} from '../Logic/Logic';
 import GlobalConnection from '../Shared/PostgresConnector';
 import {DebugTestClass, QueryTestClass} from '../Repository/TestClass';
-import {v4 as uuid} from 'uuid'
+import {v4 as uuid} from 'uuid';
 
 export class DealerController {
   readonly endpoint = express();
@@ -32,19 +32,43 @@ export class DealerController {
     this.endpoint.use(bodyParser.json());
     this.endpoint.use(bodyParser.urlencoded({extended: true}));
 
-    this.endpoint.post('/start-suite', async (request, response) => {
-      const suiteId = this.logicLayer.startTestSuite();
-      response.json({suiteId: suiteId});
+    this.endpoint.use(
+      (
+        error: Error,
+        request: Request,
+        response: Response,
+        next: NextFunction
+      ) => {
+        console.error(`Error: ${error.message}`);
+        response.status(530);
+        response.json({message: error.message, stack: error.stack});
+      }
+    );
+
+    this.endpoint.post('/start-suite', async (request, response, next) => {
+      try {
+        const suiteId = this.logicLayer.startTestSuite();
+        response.json({suiteId: suiteId});
+      } catch (error) {
+        next(error);
+      }
     });
 
-    this.endpoint.get('/request-test/:suiteID', async (request, response) => {
-      const testClass = await this.logicLayer.requestTest(
-        request.params.suiteID
-      );
-      response.download(testClass.script);
-      response.json({testID: testClass.test_id})
-      console.log(`Log: ${testClass.name} drawn`);
+    this.endpoint.get('/reserve-test/:suiteID', async (request, response) => {
+      const testId = await this.logicLayer.reserveTest(request.params.suiteID);
+      response.json({testID: testId});
     });
+
+    this.endpoint.get(
+      '/request-test/:suiteID/:testID',
+      async (request, response) => {
+        const testScript = await this.logicLayer.requestTest(
+          request.params.suiteID,
+          request.params.testID
+        );
+        response.download(testScript);
+      }
+    );
 
     this.endpoint.post(
       '/return-test/:suiteID/:testID',
@@ -65,24 +89,18 @@ export class DealerController {
       response.json({suiteID: suiteID});
     });
 
-    this.endpoint.get('/download/:suiteID', async (request, response) => {
-      const testCard = await this.logicLayer.requestTest(
-        request.params.suiteID
-      );
-      response.download(testCard.script);
-      console.log(`Log: ${testCard.name} drawn`);
-    });
-
+    /*
     this.endpoint.get('/debug', async (request, response) => {
       const debug = new DebugTestClass();
       const data = new QueryTestClass({
         testClass: debug,
         suiteId: uuid(),
-        parsedResult: 'tobeimplemented'
+        parsedResult: 'tobeimplemented',
       });
       GlobalConnection.getInstance().insertTestResult(data);
       response.json({received: 'ok'});
     });
+    */
     // DEBUG
   }
 
