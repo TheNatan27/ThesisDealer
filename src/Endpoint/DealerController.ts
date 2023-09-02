@@ -1,10 +1,17 @@
 import bodyParser from 'body-parser';
 import cors from 'cors';
-import express, {NextFunction, Request, Response} from 'express';
+import express, {
+  ErrorRequestHandler,
+  NextFunction,
+  Request,
+  Response,
+  response,
+} from 'express';
 import ip from 'ip';
 import multer from 'multer';
 import {ILogic, Logic} from '../Logic/Logic';
 import assert from 'assert';
+import {request} from 'http';
 
 export class DealerController {
   readonly endpoint = express();
@@ -30,18 +37,20 @@ export class DealerController {
     this.endpoint.use(bodyParser.json());
     this.endpoint.use(bodyParser.urlencoded({extended: true}));
 
-    this.endpoint.use(
-      (
-        error: Error,
-        request: Request,
-        response: Response,
-        next: NextFunction
-      ) => {
-        console.error(`Error: ${error.message}`);
-        response.status(530);
-        response.json({message: error.message, stack: error.stack});
-      }
-    );
+    const ErrorHandler = (
+      error: Error,
+      request: Request,
+      response: Response,
+      // eslint-disable-next-line @typescript-eslint/no-unused-vars
+      next: NextFunction
+    ) => {
+      console.error(`Error: ${error.name}`);
+      response.json({
+        name: error.name,
+        message: error.message,
+        stack: error.stack,
+      });
+    };
 
     this.endpoint.post('/start-suite', async (request, response, next) => {
       try {
@@ -90,12 +99,15 @@ export class DealerController {
     this.endpoint.get('/debug/:szoveg', async (request, response, next) => {
       try {
         assert(request.params.szoveg === 'szoveg');
+        response.json({egyenloseg: 'igaz'});
       } catch (error) {
         next(error);
       }
     });
 
     // DEBUG
+
+    this.endpoint.use(ErrorHandler);
   }
 
   async startListening() {
