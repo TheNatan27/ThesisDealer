@@ -45,7 +45,7 @@ export class TestSuiteClass {
 
   private async updateCompletedTest(testIndex: number, result: string) {
     const completedTest = this.testSet[testIndex];
-    completedTest.state = testStateSchema.enum.Done;
+    completedTest.state = testStateSchema.Enum.Done;
     completedTest.result = result;
     this.testSet[testIndex] = completedTest;
     await this.saveToDatabase(completedTest);

@@ -3,6 +3,7 @@ import {TestSuiteClass} from '../Repository/TestSuiteClass';
 import {v4 as uuid} from 'uuid';
 import assert from 'assert';
 import {createDeployment, removeDeployment} from '../Shared/DockerConnector';
+import {TestObjectType, testStateSchema} from '../Shared/TestClassTypes';
 
 export interface ILogic {
   startTestSuite(): Promise<string>;
@@ -49,6 +50,18 @@ export class Logic implements ILogic {
   async returnTest(result: string, suiteId: string, testId: string) {
     const selectedSuite = await this.selectTestSuite(suiteId);
     await selectedSuite.returnTest(testId, result);
+    await this.checkIfSuiteIsDone(selectedSuite.testSet, suiteId);
+  }
+
+  private async checkIfSuiteIsDone(testSet: TestObjectType[], suiteId: string) {
+    // If the search finds a test thats state is not done,
+    // nothing happens, but if the result is -1 docker deployments should stop
+    const notDoneTestIndex = testSet.findIndex(
+      test => test.state !== testStateSchema.Enum.Done
+    );
+    if (notDoneTestIndex === -1) {
+      await removeDeployment(suiteId);
+    }
   }
 
   private async selectTestSuite(suiteId: string) {
