@@ -60,14 +60,17 @@ export class TestSuiteClass {
 
   private createTestSet(suiteID: string) {
     const currentFiles = this.gatherTestFiles();
-    return currentFiles.map(file => ({
-      name: file,
-      script: this.readTestFile(file),
-      test_id: uuid(),
-      state: testStateSchema.enum.Ready,
-      result: null,
-      suite_id: suiteID,
-    }));
+    return currentFiles.map(
+      file =>
+        ({
+          name: file,
+          script: this.readTestFile(file),
+          test_id: uuid(),
+          state: testStateSchema.Enum.Ready,
+          result: null,
+          suite_id: suiteID,
+        } as TestObjectType)
+    );
   }
 
   private gatherTestFiles() {
