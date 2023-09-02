@@ -1,17 +1,11 @@
 import bodyParser from 'body-parser';
 import cors from 'cors';
-import express, {
-  ErrorRequestHandler,
-  NextFunction,
-  Request,
-  Response,
-  response,
-} from 'express';
+import express, {NextFunction, Request, Response} from 'express';
 import ip from 'ip';
 import multer from 'multer';
 import {ILogic, Logic} from '../Logic/Logic';
 import assert from 'assert';
-import {request} from 'http';
+import {AllTestsReservedError, debugError} from '../Errors/CustomErrors';
 
 export class DealerController {
   readonly endpoint = express();
@@ -52,13 +46,9 @@ export class DealerController {
       });
     };
 
-    this.endpoint.post('/start-suite', async (request, response, next) => {
-      try {
-        const suiteId = this.logicLayer.startTestSuite();
-        response.json({suiteId: suiteId});
-      } catch (error) {
-        next(error);
-      }
+    this.endpoint.post('/start-suite', async (request, response) => {
+      const suiteId = this.logicLayer.startTestSuite();
+      response.json({suiteId: suiteId});
     });
 
     this.endpoint.get('/reserve-test/:suiteID', async (request, response) => {
@@ -96,10 +86,10 @@ export class DealerController {
       response.json({suiteID: suiteID});
     });
 
-    this.endpoint.get('/debug/:szoveg', async (request, response, next) => {
+    this.endpoint.get('/debug/:SZOVEG', async (request, response, next) => {
+      console.log('debug!');
       try {
-        assert(request.params.szoveg === 'szoveg');
-        response.json({egyenloseg: 'igaz'});
+        throw new AllTestsReservedError(request.params.SZOVEG);
       } catch (error) {
         next(error);
       }

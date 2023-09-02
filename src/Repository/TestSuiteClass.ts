@@ -4,6 +4,7 @@ import assert from 'assert';
 import {processResults} from '../Shared/Utilities';
 import {TestObjectType, testStateSchema} from '../Shared/TestClassTypes';
 import {v4 as uuid} from 'uuid';
+import {AllTestsReservedError} from '../Errors/CustomErrors';
 
 export class TestSuiteClass {
   readonly suiteId: string;
@@ -20,12 +21,10 @@ export class TestSuiteClass {
     const testIndex = this.testSet.findIndex(
       test => test.state === testStateSchema.enum.Ready
     );
-    // eslint-disable-next-line no-useless-catch
     try {
       assert(testIndex !== -1);
     } catch (error) {
-      // throw all test are already reserved
-      throw error;
+      throw new AllTestsReservedError(this.suiteId);
     }
     this.testSet[testIndex].state = testStateSchema.enum.Reserved;
     return this.testSet[testIndex].test_id;
@@ -51,8 +50,6 @@ export class TestSuiteClass {
     this.testSet[testIndex] = completedTest;
     await this.saveToDatabase(completedTest);
   }
-
-  private checkForSuiteCompletion() {}
 
   private async saveToDatabase(completedTest: TestObjectType) {
     await processResults(completedTest);
