@@ -1,32 +1,16 @@
-import PostgresConnector from '../Postgres/PostgresConnector';
-import {
-  InitialTestType,
-  ProcessedTestType,
-  processedTestSchema,
-} from '../Repository/TestClassTypes';
+import PostgresConnector from './PostgresConnector';
+import {TestObjectType} from './TestClassTypes';
 
-export async function processResults(
-  testClass: InitialTestType,
-  result: string,
-  uuid: string
-) {
-  const processedTest: ProcessedTestType = processedTestSchema.parse({
-    name: testClass.name,
-    script: testClass.script,
-    test_id: testClass.test_id,
-    state: 'done',
-    result: result,
-    suite_id: uuid,
-  });
-  await PostgresConnector.getInstance().insertTestResult(processedTest);
+export async function processResults(completedTest: TestObjectType) {
+  await uploadResult(completedTest);
 }
 
-export function log(message: string[] | undefined) {
-  if (message) {
-    console.log(`Log: ${message.join(' ')}`);
-    return;
-  }
-  console.log(`Log: ${message}`);
+async function uploadResult(processedResult: TestObjectType) {
+  // TODO: process the result, but its format is not yet known.
+  await PostgresConnector.getInstance().insertTestResult(
+    processedResult.name,
+    processedResult.test_id,
+    processedResult.suite_id,
+    processedResult.result!
+  );
 }
-
-// TODO private fuggvany amiben feldolgozzuk a resultot

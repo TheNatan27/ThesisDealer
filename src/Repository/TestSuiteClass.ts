@@ -1,59 +1,72 @@
 import fs from 'fs';
 import path from 'path';
 import assert from 'assert';
-import {v4 as uuid} from 'uuid';
 import {processResults} from '../Shared/Utilities';
-import {InitialTestSchema, InitialTestType} from './TestClassTypes';
+import {TestObjectType, testStateSchema} from '../Shared/TestClassTypes';
+import {v4 as uuid} from 'uuid';
+import {AllTestsReservedError} from '../Errors/CustomErrors';
 
 export class TestSuiteClass {
   readonly suiteId: string;
-  readonly testSet: Array<InitialTestType>;
+  readonly dockerId: string;
+  readonly testSet: TestObjectType[];
 
-  constructor(suiteId: string) {
+  constructor(suiteId: string, dockerId: string) {
     this.suiteId = suiteId;
-    this.testSet = this.createTestSet();
+    this.dockerId = dockerId;
+    this.testSet = this.createTestSet(suiteId);
   }
 
-  async returnTest(result: string, testId: string) {
-    const foundTest = this.testSet.find(test => test.test_id === testId);
-    assert(foundTest !== undefined);
-    this.saveToDatabase(foundTest, result);
-  }
-
-  reserveTest() {
-    const foundTest = this.testSet.find(test => test.state === 'ready');
+  async reserveTestId() {
+    const testIndex = this.testSet.findIndex(
+      test => test.state === testStateSchema.enum.Ready
+    );
     try {
-      assert(foundTest !== undefined);
-      foundTest.state = 'reserved';
-      return foundTest.test_id;
+      assert(testIndex !== -1);
     } catch (error) {
-      throw new EmptyTestSuiteError(this.suiteId);
+      throw new AllTestsReservedError(this.suiteId);
     }
-  }
-  drawTest(testId: string) {
-    const foundTest = this.testSet.find(test => test.test_id === testId);
-    try {
-      assert(foundTest !== undefined);
-      foundTest.state = 'started';
-      return foundTest.script;
-    } catch (error) {
-      throw new EmptyTestSuiteError(this.suiteId);
-    }
+    this.testSet[testIndex].state = testStateSchema.enum.Reserved;
+    return this.testSet[testIndex].test_id;
   }
 
-  private async saveToDatabase(testClass: InitialTestType, result: string) {
-    await processResults(testClass, result, this.suiteId);
+  async drawTest(testId: string) {
+    const testIndex = this.testSet.findIndex(test => test.test_id === testId);
+    assert(testIndex !== -1);
+    this.testSet[testIndex].state = testStateSchema.enum.Started;
+    return this.testSet[testIndex].script;
   }
 
-  private createTestSet() {
+  async returnTest(testId: string, result: string) {
+    const testIndex = this.testSet.findIndex(test => test.test_id === testId);
+    assert(testIndex !== -1);
+    await this.updateCompletedTest(testIndex, result);
+  }
+
+  private async updateCompletedTest(testIndex: number, result: string) {
+    const completedTest = this.testSet[testIndex];
+    completedTest.state = testStateSchema.Enum.Done;
+    completedTest.result = result;
+    this.testSet[testIndex] = completedTest;
+    await this.saveToDatabase(completedTest);
+  }
+
+  private async saveToDatabase(completedTest: TestObjectType) {
+    await processResults(completedTest);
+  }
+
+  private createTestSet(suiteID: string) {
     const currentFiles = this.gatherTestFiles();
-    return currentFiles.map(file =>
-      InitialTestSchema.parse({
-        name: file,
-        script: this.readTestFile(file),
-        test_id: uuid(),
-        state: 'ready',
-      })
+    return currentFiles.map(
+      file =>
+        ({
+          name: file,
+          script: this.readTestFile(file),
+          test_id: uuid(),
+          state: testStateSchema.Enum.Ready,
+          result: null,
+          suite_id: suiteID,
+        } as TestObjectType)
     );
   }
 
