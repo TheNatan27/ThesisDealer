@@ -1,4 +1,4 @@
-import {ProcessedTestType} from '../Shared/TestClassTypes';
+import {ProcessedTestType} from './TestClassTypes';
 
 export interface ITestSuite {
   suiteId: string;

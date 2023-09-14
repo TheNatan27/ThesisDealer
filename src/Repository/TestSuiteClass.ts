@@ -3,12 +3,7 @@ import path from 'path';
 import assert from 'assert';
 import {v4 as uuid} from 'uuid';
 import {processResults} from '../Shared/Utilities';
-import {
-  initialTestSchema,
-  InitialTestType,
-  processedTestSchema,
-  ReturnedTestType,
-} from '../Shared/TestClassTypes';
+import {InitialTestSchema, InitialTestType} from './TestClassTypes';
 
 export class TestSuiteClass {
   readonly suiteId: string;
@@ -25,10 +20,25 @@ export class TestSuiteClass {
     this.saveToDatabase(foundTest, result);
   }
 
-  drawTest() {
-    const foundTest = this.testSet.find(test => test.state === 'done');
-    assert(foundTest !== undefined);
-    return foundTest;
+  reserveTest() {
+    const foundTest = this.testSet.find(test => test.state === 'ready');
+    try {
+      assert(foundTest !== undefined);
+      foundTest.state = 'reserved';
+      return foundTest.test_id;
+    } catch (error) {
+      throw new EmptyTestSuiteError(this.suiteId);
+    }
+  }
+  drawTest(testId: string) {
+    const foundTest = this.testSet.find(test => test.test_id === testId);
+    try {
+      assert(foundTest !== undefined);
+      foundTest.state = 'started';
+      return foundTest.script;
+    } catch (error) {
+      throw new EmptyTestSuiteError(this.suiteId);
+    }
   }
 
   private async saveToDatabase(testClass: InitialTestType, result: string) {
@@ -38,7 +48,7 @@ export class TestSuiteClass {
   private createTestSet() {
     const currentFiles = this.gatherTestFiles();
     return currentFiles.map(file =>
-      initialTestSchema.parse({
+      InitialTestSchema.parse({
         name: file,
         script: this.readTestFile(file),
         test_id: uuid(),

@@ -1,5 +1,5 @@
 import {Client} from 'ts-postgres';
-import {ProcessedTestType} from './TestClassTypes';
+import {ProcessedTestType} from '../Repository/TestClassTypes';
 
 class PostgresConnector {
   private client: Client;

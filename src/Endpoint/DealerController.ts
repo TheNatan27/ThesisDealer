@@ -4,8 +4,14 @@ import express from 'express';
 import ip from 'ip';
 import multer from 'multer';
 import {ILogic, Logic} from '../Logic/Logic';
-import GlobalConnection from '../Shared/PostgresConnector';
-import {v4 as uuid} from 'uuid';
+import {InitialTestSchema} from '../Repository/TestClassTypes';
+import {ErrorSchema} from '../Shared/CustomTypes';
+import {
+  dockerCommand,
+  startDeployment,
+  stopDeployment,
+} from '../Docker/DockerConnection';
+import path from 'path';
 
 export class DealerController {
   readonly endpoint = express();
@@ -32,25 +38,33 @@ export class DealerController {
     this.endpoint.use(bodyParser.urlencoded({extended: true}));
 
     this.endpoint.post('/start-suite', async (request, response) => {
-      const suiteId = this.logicLayer.startTestSuite();
+      const suiteId = await this.logicLayer.startTestSuite();
       response.json({suiteId: suiteId});
     });
 
-    this.endpoint.get('/request-test/:suiteID', async (request, response) => {
-      const testClass = await this.logicLayer.requestTest(
-        request.params.suiteID
-      );
-      response.download(testClass.script);
-      response.json({testID: testClass.test_id});
-      console.log(`Log: ${testClass.name} drawn`);
+    this.endpoint.get('/reserve-testId/:suiteID', async (request, response) => {
+      const testId = await this.logicLayer.reserveTest(request.params.suiteID);
+      response.json({test_id: testId});
     });
+
+    this.endpoint.get(
+      '/request-test-script/:suiteID/:testID',
+      async (request, response) => {
+        const testPath = await this.logicLayer.drawTest(
+          request.params.suiteID,
+          request.params.testID
+        );
+
+        response.download(testPath);
+      }
+    );
 
     this.endpoint.post(
       '/return-test/:suiteID/:testID',
       this.upload.single('result' as string),
       async (request, response) => {
         await this.logicLayer.returnTest(
-          await request.body,
+          (await request.body) as {result: string},
           request.params.suiteID,
           request.params.testID
         );
@@ -60,21 +74,52 @@ export class DealerController {
 
     // DEBUG
     this.endpoint.post('/startgame-dev', async (request, response) => {
-      const suiteID = await this.logicLayer.startTestSuite();
+      const suiteID = this.logicLayer.startTestSuite();
       response.json({suiteID: suiteID});
     });
 
-    this.endpoint.get('/download/:suiteID', async (request, response) => {
-      const testCard = await this.logicLayer.requestTest(
-        request.params.suiteID
-      );
-      response.download(testCard.script);
-      console.log(`Log: ${testCard.name} drawn`);
-    });
-
     this.endpoint.get('/debug', async (request, response) => {
+      await startDeployment('debug');
       response.json({received: 'ok'});
     });
+    this.endpoint.get('/end', async (request, response) => {
+      await stopDeployment('debug');
+      response.json({received: 'ok'});
+    });
+
+    this.endpoint.get(
+      '/request/:suiteID/:testID',
+      async (request, response) => {
+        console.log(request.params.suiteID, request.params.testID);
+
+        const data = path.join(
+          __dirname,
+          '../../testfile-storage/testone.spec.ts'
+        );
+        response.download(data);
+      }
+    );
+
+    this.endpoint.get('/reserve/:suiteID', async (request, response) => {
+      response.json({test_id: 'probaid'});
+    });
+
+    this.endpoint.post(
+      '/return/:suiteID/:testID',
+      this.upload.single('result' as string),
+      async (request, response) => {
+        const suite_id = request.params.suiteID;
+        const test_id = request.params.testID;
+        const resultData = await request.body;
+        await this.logicLayer.returnTest(
+          {result: resultData},
+          suite_id,
+          test_id
+        );
+        response.json({received: 'ok'});
+      }
+    );
+
     // DEBUG
   }
 
