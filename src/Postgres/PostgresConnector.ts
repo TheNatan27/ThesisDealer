@@ -1,5 +1,4 @@
 import {Client} from 'ts-postgres';
-import {TestObjectType} from './TestClassTypes';
 
 class PostgresConnector {
   private client: Client;
@@ -19,6 +18,22 @@ class PostgresConnector {
       await this.client.connect();
       this.isConnected = true;
       console.log('CONNECTED!');
+    }
+  }
+
+  async insertNewSuite(suiteId: string) {
+    this.connectToDb();
+
+    try {
+      const result = this.client.query(
+        `INSERT INTO suite_table VALUES ('${suiteId}');`
+      );
+
+      for await (const row of result) {
+        console.log(row);
+      }
+    } catch (error) {
+      console.error(error);
     }
   }
 

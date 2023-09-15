@@ -1,0 +1,12 @@
+CREATE TABLE suite_table (
+   suite_id UUID PRIMARY KEY
+);
+
+CREATE TABLE result_table (
+   test_id UUID PRIMARY KEY,
+   suite_id UUID,
+   test_name VARCHAR(244),
+   result_data JSON,
+   FOREIGN KEY (suite_id)
+      REFERENCES suite_table (suite_id)
+);

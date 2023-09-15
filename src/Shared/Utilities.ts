@@ -1,4 +1,4 @@
-import PostgresConnector from './PostgresConnector';
+import PostgresConnector from '../Postgres/PostgresConnector';
 import {TestObjectType} from './TestClassTypes';
 
 export async function processResults(completedTest: TestObjectType) {

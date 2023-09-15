@@ -4,6 +4,7 @@ import {v4 as uuid} from 'uuid';
 import assert from 'assert';
 import {createDeployment, removeDeployment} from '../Shared/DockerConnector';
 import {TestObjectType, testStateSchema} from '../Shared/TestClassTypes';
+import GlobalConnection from '../Postgres/PostgresConnector';
 
 export interface ILogic {
   startTestSuite(): Promise<string>;
@@ -33,7 +34,8 @@ export class Logic implements ILogic {
     const dockerId = uuid();
     const newTestSuiteClass = new TestSuiteClass(suiteId, dockerId);
     this.testRunRepository.push(newTestSuiteClass);
-    await createDeployment(suiteId, dockerId);
+    await GlobalConnection.getInstance().insertNewSuite(suiteId);
+    createDeployment(suiteId, dockerId);
     return suiteId;
   }
 

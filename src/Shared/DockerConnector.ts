@@ -2,7 +2,7 @@ import execa from 'execa';
 
 async function issueCommand(params: string) {
   try {
-    const {stdout} = await execa('docker service', [params]);
+    const {stdout} = await execa('docker', [params]);
     console.log(stdout);
   } catch (error) {
     console.log(error);
@@ -12,26 +12,31 @@ async function issueCommand(params: string) {
 
 async function createDeployment(suiteId: string, dockerId: string) {
   const parameters = [
+    'docker',
+    'service',
     'create',
-    '--env',
-    suiteId,
     '--name',
     dockerId,
     '--replicas',
-    '10',
-    'worker-image',
+    '2',
+    '--env',
+    `SUITE_ID=${suiteId}`,
+    '--env',
+    `IP_ADDRESS=${'192.168.100.39'}`,
+    'worker',
   ];
   try {
-    await issueCommand(parameters.join(' '));
+    execa(parameters.join(' ')).stdout?.pipe(process.stdout);
   } catch (error) {
+    console.log(error);
     //TODO throw deployment error
   }
 }
 
 async function removeDeployment(dockerId: string) {
   try {
-    const parameters = ['rm', dockerId];
-    await issueCommand(parameters.join(' '));
+    const parameters = ['docker', 'service', 'rm', dockerId];
+    execa(parameters.join(' ')).stdout?.pipe(process.stdout);
   } catch (error) {
     //TODO throw rm error
   }

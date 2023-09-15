@@ -47,12 +47,12 @@ export class DealerController {
     };
 
     this.endpoint.post('/start-suite', async (request, response) => {
-      const suiteId = await this.logicLayer.startTestSuite();
-      response.json({suiteId: suiteId});
+      response.json({response: this.logicLayer.startTestSuite()});
     });
 
     this.endpoint.get('/reserve-test/:suiteID', async (request, response) => {
       const testId = await this.logicLayer.reserveTest(request.params.suiteID);
+      console.log(`TESTID: ${testId}`);
       response.json({testID: testId});
     });
 
@@ -72,7 +72,7 @@ export class DealerController {
       this.upload.single('result' as string),
       async (request, response) => {
         await this.logicLayer.returnTest(
-          (await request.body) as {result: string},
+          await request.body,
           request.params.suiteID,
           request.params.testID
         );

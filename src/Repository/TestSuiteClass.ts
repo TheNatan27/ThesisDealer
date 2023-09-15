@@ -5,6 +5,7 @@ import {processResults} from '../Shared/Utilities';
 import {TestObjectType, testStateSchema} from '../Shared/TestClassTypes';
 import {v4 as uuid} from 'uuid';
 import {AllTestsReservedError} from '../Errors/CustomErrors';
+import {removeDeployment} from '../Shared/DockerConnector';
 
 export class TestSuiteClass {
   readonly suiteId: string;
@@ -24,6 +25,7 @@ export class TestSuiteClass {
     try {
       assert(testIndex !== -1);
     } catch (error) {
+      await removeDeployment(this.suiteId);
       throw new AllTestsReservedError(this.suiteId);
     }
     this.testSet[testIndex].state = testStateSchema.enum.Reserved;
