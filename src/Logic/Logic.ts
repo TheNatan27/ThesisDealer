@@ -4,6 +4,7 @@ import {v4 as uuid} from 'uuid';
 import assert from 'assert';
 import {createDeployment, removeDeployment} from '../Shared/DockerConnector';
 import {TestObjectType, testStateSchema} from '../Shared/TestClassTypes';
+import GlobalConnection from '../Shared/PostgresConnector';
 
 export interface ILogic {
   startTestSuite(): Promise<string>;
@@ -33,8 +34,15 @@ export class Logic implements ILogic {
     const dockerId = uuid();
     const newTestSuiteClass = new TestSuiteClass(suiteId, dockerId);
     this.testRunRepository.push(newTestSuiteClass);
-    await createDeployment(suiteId, dockerId);
+    await this.createSuiteInDatabase(suiteId, dockerId);
     return suiteId;
+  }
+
+  private async createSuiteInDatabase(suiteId: string, dockerId: string) {
+    const currentDate = new Date();
+    const formattedDate = currentDate.toISOString().split('T')[0];
+    await GlobalConnection.getInstance().insertSuite(suiteId, formattedDate);
+    createDeployment(suiteId, dockerId);
   }
 
   async reserveTest(suiteId: string) {
@@ -48,6 +56,9 @@ export class Logic implements ILogic {
   }
 
   async returnTest(result: string, suiteId: string, testId: string) {
+    console.log(
+      `Returned test - result: ${result}, testid: ${testId}, suiteid: ${suiteId}`
+    );
     const selectedSuite = await this.selectTestSuite(suiteId);
     await selectedSuite.returnTest(testId, result);
     await this.checkIfSuiteIsDone(selectedSuite.testSet, suiteId);
