@@ -14,7 +14,7 @@ async function uploadResult(processedResult: TestObjectType) {
     processedResult.name,
     processedResult.test_id,
     processedResult.suite_id,
-    processedResult.result!
+    JSON.stringify(processedResult.result!)
   );
 }
 

@@ -29,7 +29,10 @@ class PostgresConnector {
   ) {
     this.connectToDb();
 
-    console.log(`Insert data: ${testName} -> ${testId}`);
+    console.log(`INSERT INTO result_table VALUES ('${testId}',
+    '${suiteId}', 
+    '${testName}', 
+    '${resultData}');`);
 
     try {
       const result = this.client.query(
