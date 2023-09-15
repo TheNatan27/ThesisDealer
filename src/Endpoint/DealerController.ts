@@ -4,8 +4,7 @@ import express, {NextFunction, Request, Response} from 'express';
 import ip from 'ip';
 import multer from 'multer';
 import {ILogic, Logic} from '../Logic/Logic';
-import assert from 'assert';
-import {AllTestsReservedError, debugError} from '../Errors/CustomErrors';
+import {AllTestsReservedError} from '../Errors/CustomErrors';
 
 export class DealerController {
   readonly endpoint = express();
@@ -71,7 +70,7 @@ export class DealerController {
       '/return-test/:suiteID/:testID',
       this.upload.single('result' as string),
       async (request, response) => {
-        await this.logicLayer.returnTest(
+        this.logicLayer.returnTest(
           await request.body,
           request.params.suiteID,
           request.params.testID

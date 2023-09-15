@@ -1,12 +1,14 @@
-/* eslint-disable node/no-unpublished-import */
+// eslint-disable-next-line node/no-unpublished-import
 import {test, expect} from '@playwright/test';
 
-test('get started link', async ({page}) => {
-  await page.goto('https://playwright.dev/');
+test.describe('New Todo', () => {
+  test('should allow me to add todo items', async ({page}) => {
+    console.log('This is test 01');
+    const ipAddress = process.env.IP_ADDRESS || '192.168.100.8';
+    await page.waitForTimeout(20_000);
 
-  // Click the get started link.
-  await page.getByRole('link', {name: 'Get started'}).click();
+    await page.goto('http://localhost:5000/user/read/2');
 
-  // Expects the URL to contain intro.
-  await expect(page).toHaveURL(/.*intro/);
+    await expect(page).toHaveURL('http://localhost:5000/user/read/2');
+  });
 });

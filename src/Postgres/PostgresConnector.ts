@@ -45,7 +45,10 @@ class PostgresConnector {
   ) {
     this.connectToDb();
 
-    console.log(`Insert data: ${testName} -> ${testId}`);
+    console.log(`INSERT INTO result_table VALUES ('${testId}',
+    '${suiteId}', 
+    '${testName}', 
+    '${resultData}');`);
 
     try {
       const result = this.client.query(
@@ -53,6 +56,24 @@ class PostgresConnector {
         '${suiteId}', 
         '${testName}', 
         '${resultData}');`
+      );
+
+      for await (const row of result) {
+        console.log(row);
+      }
+    } catch (error) {
+      console.error(error);
+    }
+  }
+
+  async insertSuite(suiteId: string, date: string) {
+    this.connectToDb();
+
+    console.log(`INSERT INTO suite_table VALUES ('${suiteId}', '${date}');`);
+
+    try {
+      const result = this.client.query(
+        `INSERT INTO suite_table VALUES ('${suiteId}', '${date}');`
       );
 
       for await (const row of result) {
