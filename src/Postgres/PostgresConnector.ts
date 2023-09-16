@@ -21,22 +21,6 @@ class PostgresConnector {
     }
   }
 
-  async insertNewSuite(suiteId: string) {
-    this.connectToDb();
-
-    try {
-      const result = this.client.query(
-        `INSERT INTO suite_table VALUES ('${suiteId}');`
-      );
-
-      for await (const row of result) {
-        console.log(row);
-      }
-    } catch (error) {
-      console.error(error);
-    }
-  }
-
   async insertTestResult(
     testName: string,
     testId: string,
@@ -44,11 +28,6 @@ class PostgresConnector {
     resultData: string
   ) {
     this.connectToDb();
-
-    console.log(`INSERT INTO result_table VALUES ('${testId}',
-    '${suiteId}', 
-    '${testName}', 
-    '${resultData}');`);
 
     try {
       const result = this.client.query(
@@ -69,11 +48,11 @@ class PostgresConnector {
   async insertSuite(suiteId: string, date: string) {
     this.connectToDb();
 
-    console.log(`INSERT INTO suite_table VALUES ('${suiteId}', '${date}');`);
+    console.log(`INSERT INTO suite_table VALUES ('${suiteId}');`);
 
     try {
       const result = this.client.query(
-        `INSERT INTO suite_table VALUES ('${suiteId}', '${date}');`
+        `INSERT INTO suite_table VALUES ('${suiteId}');`
       );
 
       for await (const row of result) {

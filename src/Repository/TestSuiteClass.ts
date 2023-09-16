@@ -22,8 +22,9 @@ export class TestSuiteClass {
     try {
       assert(testIndex !== -1);
     } catch (error) {
-      await removeDeployment(this.suiteId);
-      throw new AllTestsReservedError(this.suiteId);
+      console.error('Every test id is already reserved');
+      return this.testSet[1].test_id;
+      //throw new AllTestsReservedError(this.suiteId);
     }
     this.testSet[testIndex].state = testStateSchema.Enum.Reserved;
     return this.testSet[testIndex].test_id;

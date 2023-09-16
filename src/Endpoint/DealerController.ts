@@ -51,7 +51,6 @@ export class DealerController {
 
     this.endpoint.get('/reserve-test/:suiteID', async (request, response) => {
       const testId = await this.logicLayer.reserveTest(request.params.suiteID);
-      console.log(`TESTID: ${testId}`);
       response.json({testID: testId});
     });
 
