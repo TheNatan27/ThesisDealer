@@ -1,13 +1,15 @@
 import {Client} from 'ts-postgres';
+import dotenv from 'dotenv';
 
 class PostgresConnector {
   private client: Client;
   private isConnected: boolean;
 
   constructor() {
+    dotenv.config();
     this.client = new Client({
       user: 'postgres',
-      password: 'adminu',
+      password: process.env.POSTGRES_PASSWORD,
       database: 'postgres',
     });
     this.isConnected = false;
@@ -89,7 +91,6 @@ class PostgresConnector {
     } catch (error) {
       console.error(error);
     }
-
   }
 }
 
