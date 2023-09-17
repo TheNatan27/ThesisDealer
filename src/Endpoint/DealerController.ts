@@ -38,6 +38,7 @@ export class DealerController {
       next: NextFunction
     ) => {
       console.error(`Error: ${error.name}`);
+      response.statusCode = 500;
       response.json({
         name: error.name,
         message: error.message,
@@ -49,10 +50,19 @@ export class DealerController {
       response.json({response: this.logicLayer.startTestSuite()});
     });
 
-    this.endpoint.get('/reserve-test/:suiteID', async (request, response) => {
-      const testId = await this.logicLayer.reserveTest(request.params.suiteID);
-      response.json({testID: testId});
-    });
+    this.endpoint.get(
+      '/reserve-test/:suiteID',
+      async (request, response, next) => {
+        try {
+          const testId = await this.logicLayer.reserveTest(
+            request.params.suiteID
+          );
+          response.json({testID: testId});
+        } catch (error) {
+          next(error);
+        }
+      }
+    );
 
     this.endpoint.get(
       '/request-test/:suiteID/:testID',
