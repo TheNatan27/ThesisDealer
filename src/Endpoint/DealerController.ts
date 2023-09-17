@@ -5,7 +5,7 @@ import ip from 'ip';
 import multer from 'multer';
 import {ILogic, Logic} from '../Logic/Logic';
 import {AllTestsReservedError} from '../Errors/CustomErrors';
-import GlobalConnection from '../Postgres/PostgresConnector';
+import GlobalConnection from '../Shared/PostgresConnector';
 import dotenv from 'dotenv';
 
 
