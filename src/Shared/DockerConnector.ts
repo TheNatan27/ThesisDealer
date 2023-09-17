@@ -22,7 +22,7 @@ async function removeDeployment(dockerId: string) {
     console.log(stdout);
   } catch (error) {
     console.error(error);
-    //TODO throw rm error
+    //TODO throw remove error
   }
 }
 
