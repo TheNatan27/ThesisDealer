@@ -4,7 +4,7 @@ import {v4 as uuid} from 'uuid';
 import assert from 'assert';
 import {createDeployment, removeDeployment} from '../Shared/DockerConnector';
 import {TestObjectType, testStateSchema} from '../Shared/TestClassTypes';
-import GlobalConnection from '../Postgres/PostgresConnector';
+import GlobalConnection from '../Shared/PostgresConnector';
 
 export interface ILogic {
   startTestSuite(): Promise<string>;

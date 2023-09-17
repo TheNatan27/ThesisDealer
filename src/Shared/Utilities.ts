@@ -2,7 +2,7 @@ import {TestObjectType, testStateSchema} from './TestClassTypes';
 import fs from 'fs';
 import path from 'path';
 import {v4 as uuid} from 'uuid';
-import PostgresConnector from '../Postgres/PostgresConnector';
+import PostgresConnector from './PostgresConnector';
 
 export async function processResults(completedTest: TestObjectType) {
   await uploadResult(completedTest);
