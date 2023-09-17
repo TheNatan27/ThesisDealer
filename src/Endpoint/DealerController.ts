@@ -6,6 +6,8 @@ import multer from 'multer';
 import {ILogic, Logic} from '../Logic/Logic';
 import {AllTestsReservedError} from '../Errors/CustomErrors';
 import GlobalConnection from '../Postgres/PostgresConnector';
+import dotenv from 'dotenv';
+
 
 export class DealerController {
   readonly endpoint = express();
@@ -110,8 +112,10 @@ export class DealerController {
   }
 
   async startListening() {
-    
-  await GlobalConnection.getInstance().initialize();
+  dotenv.config();  
+  if (process.env.INITIALIZE_DB) {
+    await GlobalConnection.getInstance().initialize();
+  }
     this.endpoint.listen(this.backendPort, () => {
       console.log(
         `Log: server running at http://${this.backendIp}:${this.backendPort}`
