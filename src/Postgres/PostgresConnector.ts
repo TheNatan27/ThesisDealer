@@ -62,6 +62,35 @@ class PostgresConnector {
       console.error(error);
     }
   }
+
+  async initialize() {
+    this.connectToDb();
+
+    try {
+      const result = this.client.query(
+        'CREATE TABLE suite_table (suite_id UUID PRIMARY KEY);'
+      );
+
+      for await (const row of result) {
+        console.log(row);
+      }
+    } catch (error) {
+      console.error(error);
+    }
+
+    try {
+      const result = this.client.query(
+        'CREATE TABLE result_table (test_id UUID PRIMARY KEY, suite_id UUID, test_name VARCHAR(244), result_data JSON, FOREIGN KEY (suite_id) REFERENCES suite_table (suite_id));'
+      );
+
+      for await (const row of result) {
+        console.log(row);
+      }
+    } catch (error) {
+      console.error(error);
+    }
+
+  }
 }
 
 class GlobalConnection {

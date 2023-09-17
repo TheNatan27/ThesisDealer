@@ -5,6 +5,7 @@ import ip from 'ip';
 import multer from 'multer';
 import {ILogic, Logic} from '../Logic/Logic';
 import {AllTestsReservedError} from '../Errors/CustomErrors';
+import GlobalConnection from '../Postgres/PostgresConnector';
 
 export class DealerController {
   readonly endpoint = express();
@@ -109,6 +110,8 @@ export class DealerController {
   }
 
   async startListening() {
+    
+  await GlobalConnection.getInstance().initialize();
     this.endpoint.listen(this.backendPort, () => {
       console.log(
         `Log: server running at http://${this.backendIp}:${this.backendPort}`
