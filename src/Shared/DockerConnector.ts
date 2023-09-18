@@ -1,10 +1,13 @@
 import execa from 'execa';
 import dotenv from 'dotenv';
 
-async function createDeployment(suiteId: string, dockerId: string) {
+async function createDeployment(
+  suiteId: string,
+  dockerId: string,
+  replicas: number
+) {
   dotenv.config();
   const ipAddresss = process.env.IP_ADDRESS!;
-  const replicas = process.env.REPLICAS!;
   const parameters = `docker service create --env SUITE_ID=${suiteId} --env IP_ADDRESS=${ipAddresss} --name ${dockerId} --replicas ${replicas} worker-image:latest`;
 
   try {

@@ -8,7 +8,6 @@ import {AllTestsReservedError} from '../Errors/CustomErrors';
 import GlobalConnection from '../Shared/PostgresConnector';
 import dotenv from 'dotenv';
 
-
 export class DealerController {
   readonly endpoint = express();
   readonly backendPort: string;
@@ -51,6 +50,13 @@ export class DealerController {
 
     this.endpoint.post('/start-suite', async (request, response) => {
       response.json({response: this.logicLayer.startTestSuite()});
+    });
+
+    this.endpoint.post('/start-suite/:relicas', async (request, response) => {
+      const replicaNumber = parseInt(request.params.relicas);
+      response.json({
+        response: this.logicLayer.startTestSuite(replicaNumber),
+      });
     });
 
     this.endpoint.get(
@@ -112,10 +118,10 @@ export class DealerController {
   }
 
   async startListening() {
-  dotenv.config();  
-  if (process.env.INITIALIZE_DB) {
-    await GlobalConnection.getInstance().initialize();
-  }
+    dotenv.config();
+    if (process.env.INITIALIZE_DB) {
+      await GlobalConnection.getInstance().initialize();
+    }
     this.endpoint.listen(this.backendPort, () => {
       console.log(
         `Log: server running at http://${this.backendIp}:${this.backendPort}`

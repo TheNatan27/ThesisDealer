@@ -7,7 +7,7 @@ import {TestObjectType, testStateSchema} from '../Shared/TestClassTypes';
 import GlobalConnection from '../Shared/PostgresConnector';
 
 export interface ILogic {
-  startTestSuite(): Promise<string>;
+  startTestSuite(replicas?: number): Promise<string>;
   reserveTest(suite: string): Promise<string>;
   requestTest(suiteId: string, testId: string): Promise<string>;
   returnTest(result: string, suiteId: string, testId: string): Promise<void>;
@@ -29,20 +29,24 @@ export class Logic implements ILogic {
   // 2. docker workers first reserve a testid with the suite id, then download the script with the testid
   // 3. the workers return the result with the suite and test id
 
-  async startTestSuite(): Promise<string> {
+  async startTestSuite(replicas = 5): Promise<string> {
     const suiteId = uuid();
     const dockerId = uuid();
     const newTestSuiteClass = new TestSuiteClass(suiteId, dockerId);
     this.testRunRepository.push(newTestSuiteClass);
-    await this.createSuiteInDatabase(suiteId, dockerId);
+    await this.createSuiteInDatabase(suiteId, dockerId, replicas);
     return suiteId;
   }
 
-  private async createSuiteInDatabase(suiteId: string, dockerId: string) {
+  private async createSuiteInDatabase(
+    suiteId: string,
+    dockerId: string,
+    replicas: number
+  ) {
     const currentDate = new Date();
     const formattedDate = currentDate.toISOString().split('T')[0];
     await GlobalConnection.getInstance().insertSuite(suiteId, formattedDate);
-    createDeployment(suiteId, dockerId);
+    createDeployment(suiteId, dockerId, replicas);
   }
 
   async reserveTest(suiteId: string) {
