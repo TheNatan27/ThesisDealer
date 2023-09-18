@@ -2,14 +2,16 @@ import assert from 'assert';
 import {createTestSet, processResults} from '../Shared/Utilities';
 import {TestObjectType, testStateSchema} from '../Shared/TestClassTypes';
 import {AllTestsReservedError} from '../Errors/CustomErrors';
-import {removeDeployment} from '../Shared/DockerConnector';
+import {performance} from 'perf_hooks';
 
 export class TestSuiteClass {
   readonly suiteId: string;
   readonly dockerId: string;
   readonly testSet: TestObjectType[];
+  readonly startTime: number;
 
   constructor(suiteId: string, dockerId: string) {
+    this.startTime = performance.now();
     this.suiteId = suiteId;
     this.dockerId = dockerId;
     this.testSet = createTestSet(suiteId);

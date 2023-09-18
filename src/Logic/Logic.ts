@@ -5,6 +5,7 @@ import assert from 'assert';
 import {createDeployment, removeDeployment} from '../Shared/DockerConnector';
 import {TestObjectType, testStateSchema} from '../Shared/TestClassTypes';
 import GlobalConnection from '../Shared/PostgresConnector';
+import {performance} from 'perf_hooks';
 
 export interface ILogic {
   startTestSuite(replicas?: number): Promise<string>;
@@ -65,13 +66,15 @@ export class Logic implements ILogic {
     await selectedSuite.returnTest(testId, result);
     await this.checkIfSuiteIsDone(
       selectedSuite.testSet,
-      selectedSuite.dockerId
+      selectedSuite.dockerId,
+      selectedSuite.startTime
     );
   }
 
   private async checkIfSuiteIsDone(
     testSet: TestObjectType[],
-    dockerId: string
+    dockerId: string,
+    startTime: number
   ) {
     // If the search finds a test thats state is not done,
     // nothing happens, but if the result is -1 docker deployments should stop
@@ -79,8 +82,14 @@ export class Logic implements ILogic {
       test => test.state !== testStateSchema.Enum.Done
     );
     if (notDoneTestIndex === -1) {
+      this.printPerformance(startTime);
       await removeDeployment(dockerId);
     }
+  }
+
+  private printPerformance(startTime: number) {
+    const executionTime = performance.now() - startTime;
+    console.log(`Execution time: ${executionTime / 1000} seconds`);
   }
 
   private async selectTestSuite(suiteId: string) {
