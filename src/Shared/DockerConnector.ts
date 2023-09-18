@@ -4,7 +4,7 @@ import dotenv from 'dotenv';
 async function createDeployment(
   suiteId: string,
   dockerId: string,
-  replicas: number
+  replicas: string
 ) {
   dotenv.config();
   const ipAddresss = process.env.IP_ADDRESS!;

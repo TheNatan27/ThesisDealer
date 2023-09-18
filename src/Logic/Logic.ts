@@ -8,7 +8,7 @@ import GlobalConnection from '../Shared/PostgresConnector';
 import {performance} from 'perf_hooks';
 
 export interface ILogic {
-  startTestSuite(replicas?: number): Promise<string>;
+  startTestSuite(replicas?: string): Promise<string>;
   reserveTest(suite: string): Promise<string>;
   requestTest(suiteId: string, testId: string): Promise<string>;
   returnTest(result: string, suiteId: string, testId: string): Promise<void>;
@@ -30,7 +30,7 @@ export class Logic implements ILogic {
   // 2. docker workers first reserve a testid with the suite id, then download the script with the testid
   // 3. the workers return the result with the suite and test id
 
-  async startTestSuite(replicas = 5): Promise<string> {
+  async startTestSuite(replicas = '5'): Promise<string> {
     const suiteId = uuid();
     const dockerId = uuid();
     const newTestSuiteClass = new TestSuiteClass(suiteId, dockerId);
@@ -42,7 +42,7 @@ export class Logic implements ILogic {
   private async createSuiteInDatabase(
     suiteId: string,
     dockerId: string,
-    replicas: number
+    replicas: string
   ) {
     const currentDate = new Date();
     const formattedDate = currentDate.toISOString().split('T')[0];

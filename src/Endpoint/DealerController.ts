@@ -53,7 +53,7 @@ export class DealerController {
     });
 
     this.endpoint.post('/start-suite/:relicas', async (request, response) => {
-      const replicaNumber = parseInt(request.params.relicas);
+      const replicaNumber = request.params.relicas;
       response.json({
         response: this.logicLayer.startTestSuite(replicaNumber),
       });
