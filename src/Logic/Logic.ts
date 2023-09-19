@@ -8,7 +8,12 @@ import GlobalConnection from '../Shared/PostgresConnector';
 import {performance} from 'perf_hooks';
 
 export interface ILogic {
-  startTestSuite(replicas?: string): Promise<string>;
+  startTestSuite(
+    replicas: number,
+    suiteSize: number,
+    numberOfVms: number,
+    vmType: string
+  ): Promise<string>;
   reserveTest(suite: string): Promise<string>;
   requestTest(suiteId: string, testId: string): Promise<string>;
   returnTest(result: string, suiteId: string, testId: string): Promise<void>;
@@ -30,23 +35,45 @@ export class Logic implements ILogic {
   // 2. docker workers first reserve a testid with the suite id, then download the script with the testid
   // 3. the workers return the result with the suite and test id
 
-  async startTestSuite(replicas = '5'): Promise<string> {
+  async startTestSuite(
+    replicas: number,
+    suiteSize: number,
+    numberOfVms: number,
+    vmType: string
+  ): Promise<string> {
     const suiteId = uuid();
     const dockerId = uuid();
     const newTestSuiteClass = new TestSuiteClass(suiteId, dockerId);
     this.testRunRepository.push(newTestSuiteClass);
-    await this.createSuiteInDatabase(suiteId, dockerId, replicas);
+    await this.createSuiteInDatabase(
+      suiteId,
+      dockerId,
+      replicas,
+      suiteSize,
+      numberOfVms,
+      vmType
+    );
     return suiteId;
   }
 
   private async createSuiteInDatabase(
     suiteId: string,
     dockerId: string,
-    replicas: string
+    replicas: number,
+    suiteSize: number,
+    numberOfVms: number,
+    vmType: string
   ) {
     const currentDate = new Date();
     const formattedDate = currentDate.toISOString().split('T')[0];
-    await GlobalConnection.getInstance().insertSuite(suiteId, formattedDate);
+    await GlobalConnection.getInstance().insertSuite(
+      suiteId,
+      formattedDate,
+      suiteSize,
+      numberOfVms,
+      replicas,
+      vmType
+    );
     createDeployment(suiteId, dockerId, replicas);
   }
 

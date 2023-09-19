@@ -48,16 +48,23 @@ export class DealerController {
       });
     };
 
-    this.endpoint.post('/start-suite', async (request, response) => {
-      response.json({response: this.logicLayer.startTestSuite()});
-    });
-
-    this.endpoint.post('/start-suite/:relicas', async (request, response) => {
-      const replicaNumber = request.params.relicas;
-      response.json({
-        response: this.logicLayer.startTestSuite(replicaNumber),
-      });
-    });
+    this.endpoint.post(
+      '/start-suite/:relicas/:suiteSize/:numberOfVms/:vmType',
+      async (request, response) => {
+        const replicaNumber = parseInt(request.params.relicas);
+        const suiteSize = parseInt(request.params.suiteSize);
+        const numberOfVms = parseInt(request.params.numberOfVms);
+        const vmType = request.params.vmType;
+        response.json({
+          response: this.logicLayer.startTestSuite(
+            replicaNumber,
+            suiteSize,
+            numberOfVms,
+            vmType
+          ),
+        });
+      }
+    );
 
     this.endpoint.get(
       '/reserve-test/:suiteID',
@@ -99,8 +106,8 @@ export class DealerController {
 
     // DEBUG
     this.endpoint.post('/startgame-dev', async (request, response) => {
-      const suiteID = this.logicLayer.startTestSuite();
-      response.json({suiteID: suiteID});
+      //const suiteID = this.logicLayer.startTestSuite();
+      //response.json({suiteID: suiteID});
     });
 
     this.endpoint.get('/debug/:SZOVEG', async (request, response, next) => {

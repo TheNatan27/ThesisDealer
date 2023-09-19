@@ -11,6 +11,7 @@ class PostgresConnector {
       user: 'postgres',
       password: process.env.POSTGRES_PASSWORD,
       database: 'postgres',
+      host: process.env.DATABASE_HOST,
     });
     this.isConnected = false;
   }
@@ -47,30 +48,12 @@ class PostgresConnector {
     }
   }
 
-  async insertSuite(suiteId: string, date: string) {
-    this.connectToDb();
-
-    console.log(`INSERT INTO suite_table VALUES ('${suiteId}');`);
-
-    try {
-      const result = this.client.query(
-        `INSERT INTO suite_table VALUES ('${suiteId}');`
-      );
-
-      for await (const row of result) {
-        console.log(row);
-      }
-    } catch (error) {
-      console.error(error);
-    }
-  }
-
   async initialize() {
     this.connectToDb();
 
     try {
       const result = this.client.query(
-        'CREATE TABLE suite_table (suite_id UUID PRIMARY KEY);'
+        'CREATE TABLE suite_table (suite_id UUID PRIMARY KEY, suite_size INTEGER, number_of_vms INTEGER, replica_number INTEGER, execution_time INTEGER DEFAULT 0, vm_type VARCHAR(244));'
       );
 
       for await (const row of result) {
@@ -83,6 +66,53 @@ class PostgresConnector {
     try {
       const result = this.client.query(
         'CREATE TABLE result_table (test_id UUID PRIMARY KEY, suite_id UUID, test_name VARCHAR(244), result_data JSON, FOREIGN KEY (suite_id) REFERENCES suite_table (suite_id));'
+      );
+
+      for await (const row of result) {
+        console.log(row);
+      }
+    } catch (error) {
+      console.error(error);
+    }
+  }
+
+  async insertSuite(
+    suiteId: string,
+    date: string,
+    suiteSize: number,
+    numberOfVms: number,
+    replicaNumber: number,
+    vmType: string
+  ) {
+    this.connectToDb();
+
+    console.log(
+      `INSERT INTO suite_table VALUES ('${suiteId}', ${suiteSize}, ${numberOfVms}, ${replicaNumber}, ${0}, ${vmType});`
+    );
+
+    try {
+      const result = this.client.query(
+        `INSERT INTO suite_table VALUES ('${suiteId}', ${suiteSize}, ${numberOfVms}, ${replicaNumber}, ${0}, ${vmType});`
+      );
+
+      for await (const row of result) {
+        console.log(row);
+      }
+    } catch (error) {
+      console.error(error);
+    }
+  }
+
+  async updateExecutionTime(executionTime: number, suiteId: string) {
+    this.connectToDb();
+
+    console.log(
+      `UPDATE suite_table SET execution_time = ${executionTime.toString()} WHERE suite_id = ${suiteId};`
+    );
+
+    try {
+      const result = this.client.query(
+        `UPDATE suite_table SET execution_time = ${executionTime.toString()} WHERE suite_id = ${suiteId};`
       );
 
       for await (const row of result) {

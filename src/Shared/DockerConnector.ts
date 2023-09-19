@@ -4,7 +4,7 @@ import dotenv from 'dotenv';
 async function createDeployment(
   suiteId: string,
   dockerId: string,
-  replicas: string
+  replicas: number
 ) {
   dotenv.config();
   const ipAddresss = process.env.IP_ADDRESS!;
@@ -21,7 +21,7 @@ async function createDeployment(
       '--name',
       dockerId,
       '--replicas',
-      replicas,
+      replicas.toString(),
       'merninfo/worker-image:latest',
     ]);
   } catch (error) {
