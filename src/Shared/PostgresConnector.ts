@@ -7,11 +7,14 @@ class PostgresConnector {
 
   constructor() {
     dotenv.config();
+    const databaseHost = process.env.DATABASE_HOST;
+    const databasePassword = process.env.POSTGRES_PASSWORD;
+    console.log(`DB information: ${databaseHost}, ${databasePassword}`);
     this.client = new Client({
       user: 'postgres',
-      password: process.env.POSTGRES_PASSWORD,
+      password: databasePassword,
       database: 'postgres',
-      host: process.env.DATABASE_HOST,
+      host: databaseHost,
     });
     this.isConnected = false;
   }
