@@ -94,14 +94,16 @@ export class Logic implements ILogic {
     await this.checkIfSuiteIsDone(
       selectedSuite.testSet,
       selectedSuite.dockerId,
-      selectedSuite.startTime
+      selectedSuite.startTime,
+      suiteId
     );
   }
 
   private async checkIfSuiteIsDone(
     testSet: TestObjectType[],
     dockerId: string,
-    startTime: number
+    startTime: number,
+    suiteId: string
   ) {
     // If the search finds a test thats state is not done,
     // nothing happens, but if the result is -1 docker deployments should stop
@@ -109,14 +111,18 @@ export class Logic implements ILogic {
       test => test.state !== testStateSchema.Enum.Done
     );
     if (notDoneTestIndex === -1) {
-      this.printPerformance(startTime);
+      this.printPerformance(startTime, suiteId);
       await removeDeployment(dockerId);
     }
   }
 
-  private printPerformance(startTime: number) {
-    const executionTime = performance.now() - startTime;
-    console.log(`Execution time: ${executionTime / 1000} seconds`);
+  private async printPerformance(startTime: number, suiteId: string) {
+    const executionTime = Math.floor((performance.now() - startTime) / 1000);
+    console.log(`Execution time: ${executionTime} seconds`);
+    await GlobalConnection.getInstance().updateExecutionTime(
+      executionTime,
+      suiteId
+    );
   }
 
   private async selectTestSuite(suiteId: string) {
