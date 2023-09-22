@@ -90,12 +90,12 @@ class PostgresConnector {
     this.connectToDb();
 
     console.log(
-      `INSERT INTO suite_table VALUES ('${suiteId}', ${suiteSize}, ${numberOfVms}, ${replicaNumber}, ${0}, ${vmType});`
+      `INSERT INTO "suite_table" ("suite_id", "suite_size", "number_of_vms", "replica_number", "vm_type") VALUES ('${suiteId}', ${suiteSize}, ${numberOfVms}, ${replicaNumber}, '${vmType}');`
     );
 
     try {
       const result = this.client.query(
-        `INSERT INTO suite_table VALUES ('${suiteId}', ${suiteSize}, ${numberOfVms}, ${replicaNumber}, ${0}, ${vmType});`
+        `INSERT INTO "suite_table" ("suite_id", "suite_size", "number_of_vms", "replica_number", "vm_type") VALUES ('${suiteId}', ${suiteSize}, ${numberOfVms}, ${replicaNumber}, '${vmType}')`
       );
 
       for await (const row of result) {
@@ -110,12 +110,12 @@ class PostgresConnector {
     this.connectToDb();
 
     console.log(
-      `UPDATE suite_table SET execution_time = ${executionTime.toString()} WHERE suite_id = ${suiteId};`
+      `UPDATE suite_table SET execution_time = ${executionTime.toString()} WHERE suite_id = '${suiteId}';`
     );
 
     try {
       const result = this.client.query(
-        `UPDATE suite_table SET execution_time = ${executionTime.toString()} WHERE suite_id = ${suiteId};`
+        `UPDATE suite_table SET execution_time = ${executionTime.toString()} WHERE suite_id = '${suiteId}';`
       );
 
       for await (const row of result) {
