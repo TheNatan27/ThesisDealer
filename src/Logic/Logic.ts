@@ -9,7 +9,6 @@ import {performance} from 'perf_hooks';
 
 export interface ILogic {
   startTestSuite(
-    replicas: number,
     suiteSize: number,
     numberOfVms: number,
     vmType: string
@@ -36,7 +35,6 @@ export class Logic implements ILogic {
   // 3. the workers return the result with the suite and test id
 
   async startTestSuite(
-    replicas: number,
     suiteSize: number,
     numberOfVms: number,
     vmType: string
@@ -48,7 +46,7 @@ export class Logic implements ILogic {
     await this.createSuiteInDatabase(
       suiteId,
       dockerId,
-      replicas,
+      newTestSuiteClass.testSet.length,
       suiteSize,
       numberOfVms,
       vmType
