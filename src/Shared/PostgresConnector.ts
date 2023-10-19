@@ -1,5 +1,6 @@
 import {Client} from 'ts-postgres';
 import dotenv from 'dotenv';
+import {logger} from './Logger';
 
 class PostgresConnector {
   private client: Client;
@@ -9,7 +10,7 @@ class PostgresConnector {
     dotenv.config();
     const databaseHost = process.env.DATABASE_HOST;
     const databasePassword = process.env.POSTGRES_PASSWORD;
-    console.log(`DB information: ${databaseHost}, ${databasePassword}`);
+    logger.info(`DB information: ${databaseHost}, ${databasePassword}`);
     this.client = new Client({
       user: 'postgres',
       password: databasePassword,
@@ -23,7 +24,7 @@ class PostgresConnector {
     if (!this.isConnected) {
       await this.client.connect();
       this.isConnected = true;
-      console.log('CONNECTED!');
+      logger.info('Database connected!');
     }
   }
 
@@ -44,10 +45,10 @@ class PostgresConnector {
       );
 
       for await (const row of result) {
-        console.log(row);
+        logger.info(row);
       }
     } catch (error) {
-      console.error(error);
+      logger.error(error);
     }
   }
 
@@ -60,10 +61,10 @@ class PostgresConnector {
       );
 
       for await (const row of result) {
-        console.log(row);
+        logger.info(row);
       }
     } catch (error) {
-      console.error(error);
+      logger.error(error);
     }
 
     try {
@@ -72,10 +73,10 @@ class PostgresConnector {
       );
 
       for await (const row of result) {
-        console.log(row);
+        logger.info(row);
       }
     } catch (error) {
-      console.error(error);
+      logger.error(error);
     }
   }
 
@@ -89,7 +90,7 @@ class PostgresConnector {
   ) {
     this.connectToDb();
 
-    console.log(
+    logger.info(
       `INSERT INTO "suite_table" ("suite_id", "suite_size", "number_of_vms", "replica_number", "vm_type") VALUES ('${suiteId}', ${suiteSize}, ${numberOfVms}, ${replicaNumber}, '${vmType}');`
     );
 
@@ -99,17 +100,17 @@ class PostgresConnector {
       );
 
       for await (const row of result) {
-        console.log(row);
+        logger.info(row);
       }
     } catch (error) {
-      console.error(error);
+      logger.error(error);
     }
   }
 
   async updateExecutionTime(executionTime: number, suiteId: string) {
     this.connectToDb();
 
-    console.log(
+    logger.info(
       `UPDATE suite_table SET execution_time = ${executionTime.toString()} WHERE suite_id = '${suiteId}';`
     );
 
@@ -119,10 +120,10 @@ class PostgresConnector {
       );
 
       for await (const row of result) {
-        console.log(row);
+        logger.info(row);
       }
     } catch (error) {
-      console.error(error);
+      logger.error(error);
     }
   }
 }

@@ -7,6 +7,7 @@ import {ILogic, Logic} from '../Logic/Logic';
 import {AllTestsReservedError} from '../Errors/CustomErrors';
 import GlobalConnection from '../Shared/PostgresConnector';
 import dotenv from 'dotenv';
+import {logger} from '../Shared/Logger';
 
 export class DealerController {
   readonly endpoint = express();
@@ -39,7 +40,7 @@ export class DealerController {
       // eslint-disable-next-line @typescript-eslint/no-unused-vars
       next: NextFunction
     ) => {
-      console.error(`Error: ${error.name}`);
+      logger.error(error.name);
       response.statusCode = 500;
       response.json({
         name: error.name,
@@ -111,7 +112,8 @@ export class DealerController {
     });
 
     this.endpoint.get('/debug/:SZOVEG', async (request, response, next) => {
-      console.log('debug!');
+      logger.info('thisisthedebugendpoint');
+
       try {
         throw new AllTestsReservedError(request.params.SZOVEG);
       } catch (error) {
@@ -130,7 +132,7 @@ export class DealerController {
       await GlobalConnection.getInstance().initialize();
     }
     this.endpoint.listen(this.backendPort, () => {
-      console.log(
+      logger.info(
         `Log: server running at http://${this.backendIp}:${this.backendPort}`
       );
     });

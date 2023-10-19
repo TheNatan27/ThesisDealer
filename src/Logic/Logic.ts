@@ -6,6 +6,7 @@ import {createDeployment, removeDeployment} from '../Shared/DockerConnector';
 import {TestObjectType, testStateSchema} from '../Shared/TestClassTypes';
 import GlobalConnection from '../Shared/PostgresConnector';
 import {performance} from 'perf_hooks';
+import {logger} from '../Shared/Logger';
 
 export interface ILogic {
   startTestSuite(
@@ -88,7 +89,7 @@ export class Logic implements ILogic {
   }
 
   async returnTest(result: string, suiteId: string, testId: string) {
-    console.log(`Returned test - testid: ${testId}, suiteid: ${suiteId}`);
+    logger.info(`Returned test - testid: ${testId}, suiteid: ${suiteId}`);
     const selectedSuite = await this.selectTestSuite(suiteId);
     await selectedSuite.returnTest(testId, result);
     await this.checkIfSuiteIsDone(
@@ -118,7 +119,7 @@ export class Logic implements ILogic {
 
   private async printPerformance(startTime: number, suiteId: string) {
     const executionTime = Math.floor((performance.now() - startTime) / 1000);
-    console.log(`Execution time: ${executionTime} seconds`);
+    logger.info(`Execution time: ${executionTime} seconds`);
     await GlobalConnection.getInstance().updateExecutionTime(
       executionTime,
       suiteId

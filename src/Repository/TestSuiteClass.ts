@@ -3,6 +3,7 @@ import {createTestSet, processResults} from '../Shared/Utilities';
 import {TestObjectType, testStateSchema} from '../Shared/TestClassTypes';
 import {AllTestsReservedError} from '../Errors/CustomErrors';
 import {performance} from 'perf_hooks';
+import {logger} from '../Shared/Logger';
 
 export class TestSuiteClass {
   readonly suiteId: string;
@@ -24,7 +25,7 @@ export class TestSuiteClass {
     try {
       assert(testIndex !== -1);
     } catch (error) {
-      console.error('Every test id is already reserved');
+      logger.error('Every test id is already reserved');
       //return this.testSet[1].test_id;
       throw new AllTestsReservedError(this.suiteId);
     }

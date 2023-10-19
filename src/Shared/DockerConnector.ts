@@ -1,5 +1,6 @@
 import execa from 'execa';
 import dotenv from 'dotenv';
+import {logger} from './Logger';
 
 async function createDeployment(
   suiteId: string,
@@ -8,7 +9,6 @@ async function createDeployment(
 ) {
   dotenv.config();
   const ipAddresss = process.env.IP_ADDRESS!;
-  const parameters = `docker service create --env SUITE_ID=${suiteId} --env IP_ADDRESS=${ipAddresss} --name ${dockerId} --replicas ${replicas} worker-image:latest`;
 
   try {
     await execa('docker', [
@@ -25,18 +25,18 @@ async function createDeployment(
       'merninfo/worker-image:latest',
     ]);
   } catch (error) {
-    console.error(error);
+    logger.error(error);
     //TODO throw deployment error
   }
 }
 
 async function removeDeployment(dockerId: string) {
-  console.log(`Remove docker service: ${dockerId}`);
+  logger.info(`Remove docker service: ${dockerId}`);
   try {
     const {stdout} = await execa('docker', ['service', 'rm', dockerId]);
-    console.log(stdout);
+    logger.info(stdout);
   } catch (error) {
-    console.error(error);
+    logger.error(error);
     //TODO throw remove error
   }
 }

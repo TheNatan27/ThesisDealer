@@ -3,6 +3,7 @@ import fs from 'fs';
 import path from 'path';
 import {v4 as uuid} from 'uuid';
 import PostgresConnector from './PostgresConnector';
+import {logger} from './Logger';
 
 export async function processResults(completedTest: TestObjectType) {
   await uploadResult(completedTest);
@@ -42,7 +43,7 @@ function readTestFile(fileName: string) {
     const data = path.join(__dirname, `../../testfile-storage/${fileName}`);
     return data;
   } catch (error) {
-    console.error(error);
+    logger.error(error);
     throw error;
   }
 }
