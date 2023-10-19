@@ -50,15 +50,13 @@ export class DealerController {
     };
 
     this.endpoint.post(
-      '/start-suite/:relicas/:suiteSize/:numberOfVms/:vmType',
+      '/start-suite/:suiteSize/:numberOfVms/:vmType',
       async (request, response) => {
-        const replicaNumber = parseInt(request.params.relicas);
         const suiteSize = parseInt(request.params.suiteSize);
         const numberOfVms = parseInt(request.params.numberOfVms);
         const vmType = request.params.vmType;
         response.json({
           response: this.logicLayer.startTestSuite(
-            replicaNumber,
             suiteSize,
             numberOfVms,
             vmType

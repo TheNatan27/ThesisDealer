@@ -22,6 +22,8 @@ async function createDeployment(
       dockerId,
       '--replicas',
       replicas.toString(),
+      '--mode',
+      'replicated-job',
       'merninfo/worker-image:latest',
     ]);
   } catch (error) {
