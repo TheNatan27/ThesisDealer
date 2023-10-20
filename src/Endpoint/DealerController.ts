@@ -54,6 +54,7 @@ export class DealerController {
       } catch (error) {
         next(error);
       }
+      response.json({message: 'Database initialized.'});
     });
 
     this.endpoint.post(
