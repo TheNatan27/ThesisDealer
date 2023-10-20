@@ -43,6 +43,7 @@ async function removeDeployment(dockerId: string) {
   let counter = 0;
   while (!zeroReplicasRemain && counter < 30) {
     zeroReplicasRemain = await parseServiceInformation(dockerId);
+    await sleep(1_000);
     counter++;
   }
   if (zeroReplicasRemain) {
@@ -97,3 +98,7 @@ async function removeServiceCommand(dockerId: string) {
   }
 }
 export {createDeployment, removeDeployment};
+
+function sleep(ms: number) {
+  return new Promise(resolve => {});
+}
