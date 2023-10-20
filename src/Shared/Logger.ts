@@ -8,12 +8,12 @@ const fileTransport = pino.transport({
   targets: [
     {
       target: 'pino-pretty',
-      level: 'info',
+      level: 'debug',
       options: {},
     },
     {
       target: 'pino/file',
-      level: 'info',
+      level: 'debug',
       options: {destination: logfolder},
     },
   ],

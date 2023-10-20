@@ -75,12 +75,14 @@ async function monitorDeployment(dockerId: string) {
       '--filter',
       `name=${dockerId}`,
     ]);
+    logger.debug(stdout);
     serviceInformation = stdout;
   } catch (error) {
     logger.error(error);
     serviceInformation = undefined;
   }
   assert(serviceInformation !== undefined);
+  logger.debug(serviceInformation);
   return serviceInformation;
 }
 
