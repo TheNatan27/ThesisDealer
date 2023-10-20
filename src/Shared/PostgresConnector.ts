@@ -78,6 +78,7 @@ class PostgresConnector {
     } catch (error) {
       logger.error(error);
     }
+    logger.info('Database initialized!');
   }
 
   async insertSuite(
