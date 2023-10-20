@@ -1,6 +1,9 @@
 import execa from 'execa';
 import dotenv from 'dotenv';
 import {logger} from './Logger';
+import assert from 'assert';
+import {serviceInformationSchema} from './CustomTypes';
+import z from 'zod';
 
 async function createDeployment(
   suiteId: string,
@@ -36,6 +39,49 @@ async function createDeployment(
 }
 
 async function removeDeployment(dockerId: string) {
+  let zeroReplicasRemain = false;
+  let counter = 0;
+  while (zeroReplicasRemain && counter < 30) {
+    zeroReplicasRemain = await parseServiceInformation(dockerId);
+    counter++;
+  }
+  if (zeroReplicasRemain) {
+    await removeServiceCommand(dockerId);
+  }
+}
+
+async function parseServiceInformation(dockerId: string) {
+  try {
+    const stdout = await monitorDeployment(dockerId);
+    serviceInformationSchema.parse(stdout);
+    return true;
+  } catch (error) {
+    logger.error(error);
+    return false;
+  }
+}
+
+async function monitorDeployment(dockerId: string) {
+  let serviceInformation: string | undefined;
+  try {
+    const {stdout} = await execa('docker', [
+      'service',
+      'ls',
+      '--format',
+      'json',
+      '--filter',
+      `name=${dockerId}`,
+    ]);
+    serviceInformation = stdout;
+  } catch (error) {
+    logger.error(error);
+    serviceInformation = undefined;
+  }
+  assert(serviceInformation !== undefined);
+  return serviceInformation;
+}
+
+async function removeServiceCommand(dockerId: string) {
   logger.info(`Remove docker service: ${dockerId}`);
   try {
     const {stdout} = await execa('docker', ['service', 'rm', dockerId]);
