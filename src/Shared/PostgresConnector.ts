@@ -86,17 +86,18 @@ class PostgresConnector {
     suiteSize: number,
     numberOfVms: number,
     replicaNumber: number,
-    vmType: string
+    vmType: string,
+    concurrency: number
   ) {
     this.connectToDb();
 
     logger.info(
-      `INSERT INTO "suite_table" ("suite_id", "suite_size", "number_of_vms", "replica_number", "vm_type") VALUES ('${suiteId}', ${suiteSize}, ${numberOfVms}, ${replicaNumber}, '${vmType}');`
+      `INSERT INTO "suite_table" ("suite_id", "suite_size", "number_of_vms", "replica_number", "vm_type", "concurrency") VALUES ('${suiteId}', ${suiteSize}, ${numberOfVms}, ${replicaNumber}, '${vmType}', ${concurrency});`
     );
 
     try {
       const result = this.client.query(
-        `INSERT INTO "suite_table" ("suite_id", "suite_size", "number_of_vms", "replica_number", "vm_type") VALUES ('${suiteId}', ${suiteSize}, ${numberOfVms}, ${replicaNumber}, '${vmType}')`
+        `INSERT INTO "suite_table" ("suite_id", "suite_size", "number_of_vms", "replica_number", "vm_type", "concurrency") VALUES ('${suiteId}', ${suiteSize}, ${numberOfVms}, ${replicaNumber}, '${vmType}', ${concurrency})`
       );
 
       for await (const row of result) {

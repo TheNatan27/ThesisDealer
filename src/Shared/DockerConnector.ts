@@ -5,7 +5,8 @@ import {logger} from './Logger';
 async function createDeployment(
   suiteId: string,
   dockerId: string,
-  replicas: number
+  replicas: number,
+  concurrency: number
 ) {
   dotenv.config();
   const ipAddresss = process.env.IP_ADDRESS!;
@@ -24,6 +25,8 @@ async function createDeployment(
       replicas.toString(),
       '--mode',
       'replicated-job',
+      '--max-concurrent',
+      concurrency.toString(),
       'merninfo/worker-image:latest',
     ]);
   } catch (error) {

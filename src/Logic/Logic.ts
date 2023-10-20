@@ -12,7 +12,8 @@ export interface ILogic {
   startTestSuite(
     suiteSize: number,
     numberOfVms: number,
-    vmType: string
+    vmType: string,
+    concurrency?: number
   ): Promise<string>;
   reserveTest(suite: string): Promise<string>;
   requestTest(suiteId: string, testId: string): Promise<string>;
@@ -38,7 +39,8 @@ export class Logic implements ILogic {
   async startTestSuite(
     suiteSize: number,
     numberOfVms: number,
-    vmType: string
+    vmType: string,
+    concurrency?: number
   ): Promise<string> {
     const suiteId = uuid();
     const dockerId = uuid();
@@ -50,7 +52,8 @@ export class Logic implements ILogic {
       newTestSuiteClass.testSet.length,
       suiteSize,
       numberOfVms,
-      vmType
+      vmType,
+      concurrency || newTestSuiteClass.testSet.length
     );
     return suiteId;
   }
@@ -61,7 +64,8 @@ export class Logic implements ILogic {
     replicas: number,
     suiteSize: number,
     numberOfVms: number,
-    vmType: string
+    vmType: string,
+    concurrency: number
   ) {
     const currentDate = new Date();
     const formattedDate = currentDate.toISOString().split('T')[0];
@@ -71,9 +75,10 @@ export class Logic implements ILogic {
       suiteSize,
       numberOfVms,
       replicas,
-      vmType
+      vmType,
+      concurrency
     );
-    createDeployment(suiteId, dockerId, replicas);
+    createDeployment(suiteId, dockerId, replicas, concurrency);
   }
 
   async reserveTest(suiteId: string) {
