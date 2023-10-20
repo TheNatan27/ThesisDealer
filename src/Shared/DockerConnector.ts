@@ -41,7 +41,7 @@ async function createDeployment(
 async function removeDeployment(dockerId: string) {
   let zeroReplicasRemain = false;
   let counter = 0;
-  while (zeroReplicasRemain && counter < 30) {
+  while (!zeroReplicasRemain && counter < 30) {
     zeroReplicasRemain = await parseServiceInformation(dockerId);
     counter++;
   }
