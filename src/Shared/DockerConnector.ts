@@ -42,7 +42,7 @@ async function removeDeployment(dockerId: string) {
   let zeroReplicasRemain = false;
   let counter = 0;
   logger.warn('---------------LOOP---------------');
-  while (!zeroReplicasRemain && counter < 30) {
+  while (!zeroReplicasRemain && counter < 10) {
     zeroReplicasRemain = await parseServiceInformation(dockerId);
     logger.warn(`------Zero: ${zeroReplicasRemain}`);
     await sleep(1_000);
@@ -56,21 +56,6 @@ async function removeDeployment(dockerId: string) {
 async function parseServiceInformation(dockerId: string) {
   try {
     logger.warn('--------------PARSE-------------------');
-    const stdout = await monitorDeployment(dockerId);
-    assert(stdout !== undefined);
-    logger.warn(stdout);
-    const parsedInfo = serviceInformationSchema.parse(JSON.parse(stdout));
-    logger.warn(JSON.stringify(parsedInfo));
-    logger.warn(parsedInfo);
-    return true;
-  } catch (error) {
-    logger.error(error);
-    return false;
-  }
-}
-
-async function monitorDeployment(dockerId: string) {
-  try {
     const {stdout} = await execa('docker', [
       'service',
       'ls',
@@ -79,10 +64,13 @@ async function monitorDeployment(dockerId: string) {
       '--filter',
       `name=${dockerId}`,
     ]);
-    return stdout;
+    assert(stdout !== undefined);
+    logger.warn(stdout);
+    serviceInformationSchema.parse(JSON.parse(stdout));
+    return true;
   } catch (error) {
-    logger.error(error);
-    return undefined;
+    logger.error('Failed to parse service information.');
+    return false;
   }
 }
 
