@@ -10,7 +10,6 @@ import {logger} from '../Shared/Logger';
 
 export interface ILogic {
   startTestSuite(
-    suiteSize: number,
     numberOfVms: number,
     vmType: string,
     concurrency?: number
@@ -37,7 +36,6 @@ export class Logic implements ILogic {
   // 3. the workers return the result with the suite and test id
 
   async startTestSuite(
-    suiteSize: number,
     numberOfVms: number,
     vmType: string,
     concurrency?: number
@@ -50,7 +48,6 @@ export class Logic implements ILogic {
       suiteId,
       dockerId,
       newTestSuiteClass.testSet.length,
-      suiteSize,
       numberOfVms,
       vmType,
       concurrency || newTestSuiteClass.testSet.length
@@ -61,7 +58,6 @@ export class Logic implements ILogic {
   private async createSuiteInDatabase(
     suiteId: string,
     dockerId: string,
-    replicas: number,
     suiteSize: number,
     numberOfVms: number,
     vmType: string,
@@ -74,11 +70,10 @@ export class Logic implements ILogic {
       formattedDate,
       suiteSize,
       numberOfVms,
-      replicas,
       vmType,
       concurrency
     );
-    createDeployment(suiteId, dockerId, replicas, concurrency);
+    createDeployment(suiteId, dockerId, suiteSize, concurrency);
   }
 
   async reserveTest(suiteId: string) {

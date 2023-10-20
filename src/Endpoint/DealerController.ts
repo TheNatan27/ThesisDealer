@@ -57,9 +57,8 @@ export class DealerController {
     });
 
     this.endpoint.post(
-      '/start-suite/:suiteSize/:numberOfVms/:vmType/:concurrency?',
+      '/start-suite/:numberOfVms/:vmType/:concurrency?',
       async (request, response) => {
-        const suiteSize = parseInt(request.params.suiteSize);
         const numberOfVms = parseInt(request.params.numberOfVms);
         const vmType = request.params.vmType;
         let concurrency;
@@ -68,7 +67,6 @@ export class DealerController {
         }
         response.json({
           response: this.logicLayer.startTestSuite(
-            suiteSize,
             numberOfVms,
             vmType,
             concurrency

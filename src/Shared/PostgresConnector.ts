@@ -57,7 +57,7 @@ class PostgresConnector {
 
     try {
       const result = this.client.query(
-        'CREATE TABLE suite_table (suite_id UUID PRIMARY KEY, suite_size INTEGER, number_of_vms INTEGER, replica_number INTEGER, execution_time INTEGER DEFAULT 0, vm_type VARCHAR(244), concurrency INTEGER);'
+        'CREATE TABLE suite_table (suite_id UUID PRIMARY KEY, suite_size INTEGER, number_of_vms INTEGER, execution_time INTEGER DEFAULT 0, vm_type VARCHAR(244), concurrency INTEGER);'
       );
 
       for await (const row of result) {
@@ -86,19 +86,18 @@ class PostgresConnector {
     date: string,
     suiteSize: number,
     numberOfVms: number,
-    replicaNumber: number,
     vmType: string,
     concurrency: number
   ) {
     this.connectToDb();
 
     logger.info(
-      `INSERT INTO "suite_table" ("suite_id", "suite_size", "number_of_vms", "replica_number", "vm_type", "concurrency") VALUES ('${suiteId}', ${suiteSize}, ${numberOfVms}, ${replicaNumber}, '${vmType}', ${concurrency});`
+      `INSERT INTO "suite_table" ("suite_id", "suite_size", "number_of_vms", "vm_type", "concurrency") VALUES ('${suiteId}', ${suiteSize}, ${numberOfVms}, '${vmType}', ${concurrency});`
     );
 
     try {
       const result = this.client.query(
-        `INSERT INTO "suite_table" ("suite_id", "suite_size", "number_of_vms", "replica_number", "vm_type", "concurrency") VALUES ('${suiteId}', ${suiteSize}, ${numberOfVms}, ${replicaNumber}, '${vmType}', ${concurrency})`
+        `INSERT INTO "suite_table" ("suite_id", "suite_size", "number_of_vms", "vm_type", "concurrency") VALUES ('${suiteId}', ${suiteSize}, ${numberOfVms}, '${vmType}', ${concurrency})`
       );
 
       for await (const row of result) {

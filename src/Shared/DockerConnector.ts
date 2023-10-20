@@ -5,7 +5,7 @@ import {logger} from './Logger';
 async function createDeployment(
   suiteId: string,
   dockerId: string,
-  replicas: number,
+  suiteSize: number,
   concurrency: number
 ) {
   dotenv.config();
@@ -22,7 +22,7 @@ async function createDeployment(
       '--name',
       dockerId,
       '--replicas',
-      replicas.toString(),
+      suiteSize.toString(),
       '--mode',
       'replicated-job',
       '--max-concurrent',
