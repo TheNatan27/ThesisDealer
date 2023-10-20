@@ -55,6 +55,7 @@ async function parseServiceInformation(dockerId: string) {
   try {
     const stdout = await monitorDeployment(dockerId);
     logger.debug(stdout);
+    assert(stdout !== undefined);
     const parsedInfo = serviceInformationSchema.parse(JSON.parse(stdout));
     logger.debug(JSON.stringify(parsedInfo));
     logger.debug(parsedInfo);
@@ -66,7 +67,6 @@ async function parseServiceInformation(dockerId: string) {
 }
 
 async function monitorDeployment(dockerId: string) {
-  let serviceInformation: string | undefined;
   try {
     const {stdout} = await execa('docker', [
       'service',
@@ -77,14 +77,11 @@ async function monitorDeployment(dockerId: string) {
       `name=${dockerId}`,
     ]);
     logger.debug(stdout);
-    serviceInformation = stdout;
+    return stdout;
   } catch (error) {
     logger.error(error);
-    serviceInformation = undefined;
+    return undefined;
   }
-  assert(serviceInformation !== undefined);
-  logger.debug(serviceInformation);
-  return serviceInformation;
 }
 
 async function removeServiceCommand(dockerId: string) {
