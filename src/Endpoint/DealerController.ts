@@ -48,6 +48,14 @@ export class DealerController {
       });
     };
 
+    this.endpoint.post('/initialize-db', async (request, response, next) => {
+      try {
+        await GlobalConnection.getInstance().initialize();
+      } catch (error) {
+        next(error);
+      }
+    });
+
     this.endpoint.post(
       '/start-suite/:suiteSize/:numberOfVms/:vmType/:concurrency?',
       async (request, response) => {
@@ -118,14 +126,6 @@ export class DealerController {
 
       try {
         throw new AllTestsReservedError(request.params.SZOVEG);
-      } catch (error) {
-        next(error);
-      }
-    });
-
-    this.endpoint.post('/initalize-db', async (request, response, next) => {
-      try {
-        await GlobalConnection.getInstance().initialize();
       } catch (error) {
         next(error);
       }
