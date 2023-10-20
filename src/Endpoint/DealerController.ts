@@ -6,7 +6,6 @@ import multer from 'multer';
 import {ILogic, Logic} from '../Logic/Logic';
 import {AllTestsReservedError} from '../Errors/CustomErrors';
 import GlobalConnection from '../Shared/PostgresConnector';
-import dotenv from 'dotenv';
 import {logger} from '../Shared/Logger';
 
 export class DealerController {
@@ -124,16 +123,20 @@ export class DealerController {
       }
     });
 
+    this.endpoint.post('/initalize-db', async (request, response, next) => {
+      try {
+        await GlobalConnection.getInstance().initialize();
+      } catch (error) {
+        next(error);
+      }
+    });
+
     // DEBUG
 
     this.endpoint.use(ErrorHandler);
   }
 
   async startListening() {
-    dotenv.config();
-    if (process.env.INITIALIZE_DB) {
-      await GlobalConnection.getInstance().initialize();
-    }
     this.endpoint.listen(this.backendPort, () => {
       logger.info(
         `Log: server running at http://${this.backendIp}:${this.backendPort}`

@@ -57,7 +57,7 @@ class PostgresConnector {
 
     try {
       const result = this.client.query(
-        'CREATE TABLE suite_table (suite_id UUID PRIMARY KEY, suite_size INTEGER, number_of_vms INTEGER, replica_number INTEGER, execution_time INTEGER DEFAULT 0, vm_type VARCHAR(244));'
+        'CREATE TABLE suite_table (suite_id UUID PRIMARY KEY, suite_size INTEGER, number_of_vms INTEGER, replica_number INTEGER, execution_time INTEGER DEFAULT 0, vm_type VARCHAR(244), concurrency INTEGER);'
       );
 
       for await (const row of result) {
