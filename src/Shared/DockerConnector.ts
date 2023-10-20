@@ -53,7 +53,10 @@ async function removeDeployment(dockerId: string) {
 async function parseServiceInformation(dockerId: string) {
   try {
     const stdout = await monitorDeployment(dockerId);
-    serviceInformationSchema.parse(stdout);
+    logger.debug(stdout);
+    const parsedInfo = serviceInformationSchema.parse(stdout);
+    logger.debug(JSON.stringify(parsedInfo));
+    logger.debug(parsedInfo);
     return true;
   } catch (error) {
     logger.error(error);
