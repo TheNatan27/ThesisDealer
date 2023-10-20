@@ -32,15 +32,4 @@ async function createDeployment(
   }
 }
 
-async function removeDeployment(dockerId: string) {
-  logger.info(`Remove docker service: ${dockerId}`);
-  try {
-    const {stdout} = await execa('docker', ['service', 'rm', dockerId]);
-    logger.info(stdout);
-  } catch (error) {
-    logger.error(error);
-    //TODO throw remove error
-  }
-}
-
-export {createDeployment, removeDeployment};
+export {createDeployment};
