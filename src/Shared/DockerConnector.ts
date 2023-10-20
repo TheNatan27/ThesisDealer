@@ -41,10 +41,10 @@ async function createDeployment(
 async function removeDeployment(dockerId: string) {
   let zeroReplicasRemain = false;
   let counter = 0;
-  logger.warn('---------------LOOP---------------');
+  logger.debug(`removeDeployment loop started for: ${dockerId}`);
   while (!zeroReplicasRemain && counter < 10) {
     zeroReplicasRemain = await parseServiceInformation(dockerId);
-    logger.warn(`------Zero: ${zeroReplicasRemain}`);
+    logger.debug(`zeroRepliasRemain value: ${zeroReplicasRemain}`);
     await sleep(1_000);
     counter++;
   }
@@ -55,7 +55,6 @@ async function removeDeployment(dockerId: string) {
 
 async function parseServiceInformation(dockerId: string) {
   try {
-    logger.warn('--------------PARSE-------------------');
     const {stdout} = await execa('docker', [
       'service',
       'ls',
@@ -65,7 +64,7 @@ async function parseServiceInformation(dockerId: string) {
       `name=${dockerId}`,
     ]);
     assert(stdout !== undefined);
-    logger.warn(stdout);
+    logger.debug(`Parsed service information: ${stdout}`);
     serviceInformationSchema.parse(JSON.parse(stdout));
     return true;
   } catch (error) {
