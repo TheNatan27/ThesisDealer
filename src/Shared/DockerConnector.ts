@@ -43,6 +43,7 @@ async function removeDeployment(dockerId: string) {
   let counter = 0;
   while (!zeroReplicasRemain && counter < 30) {
     zeroReplicasRemain = await parseServiceInformation(dockerId);
+    logger.debug(`------Zero: ${zeroReplicasRemain}`);
     await sleep(1_000);
     counter++;
   }
@@ -53,9 +54,10 @@ async function removeDeployment(dockerId: string) {
 
 async function parseServiceInformation(dockerId: string) {
   try {
+    logger.debug('--------------PARSE-------------------');
     const stdout = await monitorDeployment(dockerId);
-    logger.debug(stdout);
     assert(stdout !== undefined);
+    logger.debug(stdout);
     const parsedInfo = serviceInformationSchema.parse(JSON.parse(stdout));
     logger.debug(JSON.stringify(parsedInfo));
     logger.debug(parsedInfo);
@@ -76,7 +78,6 @@ async function monitorDeployment(dockerId: string) {
       '--filter',
       `name=${dockerId}`,
     ]);
-    logger.debug(stdout);
     return stdout;
   } catch (error) {
     logger.error(error);
@@ -97,5 +98,7 @@ async function removeServiceCommand(dockerId: string) {
 export {createDeployment, removeDeployment};
 
 function sleep(ms: number) {
-  return new Promise(resolve => {});
+  return new Promise(resolve => {
+    setTimeout(resolve, ms);
+  });
 }
