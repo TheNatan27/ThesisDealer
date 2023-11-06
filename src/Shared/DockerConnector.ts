@@ -3,7 +3,6 @@ import dotenv from 'dotenv';
 import {logger} from './Logger';
 import assert from 'assert';
 import {serviceInformationSchema} from './CustomTypes';
-import z from 'zod';
 
 async function createDeployment(
   suiteId: string,
@@ -68,7 +67,7 @@ async function parseServiceInformation(dockerId: string) {
     serviceInformationSchema.parse(JSON.parse(stdout));
     return true;
   } catch (error) {
-    logger.error('Failed to parse service information.');
+    logger.warn('Failed to parse service information.');
     return false;
   }
 }
