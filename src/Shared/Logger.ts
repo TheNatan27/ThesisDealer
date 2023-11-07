@@ -3,6 +3,8 @@ import dotenv from 'dotenv';
 
 dotenv.config();
 const logfolder = process.env.LOG_FOLDER || `${__dirname}\\dealer.log`;
+const performanceLogFolder =
+  process.env.PERFORMANCE_FOLDER || `${__dirname}\\performance.log`;
 
 const fileTransport = pino.transport({
   targets: [
@@ -19,6 +21,16 @@ const fileTransport = pino.transport({
   ],
 });
 
+const performanceFile = pino.transport({
+  targets: [
+    {
+      target: 'pino/file',
+      level: 'info',
+      options: {destination: performanceLogFolder},
+    },
+  ],
+});
+
 const logger = pino(
   {
     timestamp: pino.stdTimeFunctions.isoTime,
@@ -26,4 +38,11 @@ const logger = pino(
   fileTransport
 );
 
-export {logger};
+const performanceLogger = pino(
+  {
+    timestamp: pino.stdTimeFunctions.isoTime,
+  },
+  performanceFile
+);
+
+export {logger, performanceLogger};

@@ -6,7 +6,7 @@ import {createDeployment, removeDeployment} from '../Shared/DockerConnector';
 import {TestObjectType, testStateSchema} from '../Shared/CustomTypes';
 import GlobalConnection from '../Shared/PostgresConnector';
 import {performance} from 'perf_hooks';
-import {logger} from '../Shared/Logger';
+import {logger, performanceLogger} from '../Shared/Logger';
 
 export interface ILogic {
   startTestSuite(
@@ -52,6 +52,7 @@ export class Logic implements ILogic {
       vmType,
       concurrency || newTestSuiteClass.testSet.length
     );
+    performanceLogger.info({suite: suiteId}, 'Deployment started.');
     return suiteId;
   }
 
@@ -111,6 +112,7 @@ export class Logic implements ILogic {
     );
     if (notDoneTestIndex === -1) {
       this.printPerformance(startTime, suiteId);
+      performanceLogger.info({suite: suiteId}, 'Deployment finished.');
       await removeDeployment(dockerId);
     }
   }
