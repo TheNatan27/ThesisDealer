@@ -1,6 +1,6 @@
 import bodyParser from 'body-parser';
 import cors from 'cors';
-import express, {NextFunction, Request, Response} from 'express';
+import express, {NextFunction, Request, Response, response} from 'express';
 import ip from 'ip';
 import multer from 'multer';
 import {ILogic, Logic} from '../Logic/Logic';
@@ -47,6 +47,11 @@ export class DealerController {
         stack: error.stack,
       });
     };
+
+    this.endpoint.post('/run-benchmark', async (request, response, next) => {
+      await this.logicLayer.runConcurrencyBenchmark();
+      response.json({'benchmark-run': 'started'});
+    });
 
     this.endpoint.post('/initialize-db', async (request, response, next) => {
       try {

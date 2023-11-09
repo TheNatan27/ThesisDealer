@@ -17,7 +17,7 @@ export interface ILogic {
   reserveTest(suite: string): Promise<string>;
   requestTest(suiteId: string, testId: string): Promise<string>;
   returnTest(result: string, suiteId: string, testId: string): Promise<void>;
-
+  runConcurrencyBenchmark(): Promise<void>;
   readonly testRunRepository: Array<TestSuiteClass>;
 }
 
@@ -132,5 +132,23 @@ export class Logic implements ILogic {
     );
     assert(selectedSuite !== undefined);
     return selectedSuite;
+  }
+
+  async runConcurrencyBenchmark() {
+    const configurations = [
+      5, 5, 5, 10, 10, 10, 15, 15, 15, 20, 20, 20, 25, 25, 25, 30, 30, 30,
+    ];
+
+    for await (const configuration of configurations) {
+      logger.warn(`Benchmark run started for ${configuration}.`);
+      const suiteId = await this.startTestSuite(
+        30,
+        'concurrency-benchmark',
+        configuration
+      );
+      logger.warn(
+        `Benchmark run for ${configuration} finished, Suite id: ${suiteId}.`
+      );
+    }
   }
 }
