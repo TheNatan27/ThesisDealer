@@ -38,7 +38,8 @@ export class Logic implements ILogic {
   async startTestSuite(
     numberOfVms: number,
     vmType: string,
-    concurrency?: number
+    concurrency?: number,
+    parallelDeploymentEnabled = true
   ): Promise<string> {
     const suiteId = uuid();
     const dockerId = uuid();
@@ -50,7 +51,8 @@ export class Logic implements ILogic {
       newTestSuiteClass.testSet.length,
       numberOfVms,
       vmType,
-      concurrency || newTestSuiteClass.testSet.length
+      concurrency || newTestSuiteClass.testSet.length,
+      parallelDeploymentEnabled
     );
     performanceLogger.info({suite: suiteId}, 'Deployment started.');
     return suiteId;
@@ -62,7 +64,8 @@ export class Logic implements ILogic {
     suiteSize: number,
     numberOfVms: number,
     vmType: string,
-    concurrency: number
+    concurrency: number,
+    parallelDeploymentEnabled = true
   ) {
     const currentDate = new Date();
     const formattedDate = currentDate.toISOString().split('T')[0];
@@ -74,7 +77,11 @@ export class Logic implements ILogic {
       vmType,
       concurrency
     );
-    createDeployment(suiteId, dockerId, suiteSize, concurrency);
+    if (parallelDeploymentEnabled) {
+      createDeployment(suiteId, dockerId, suiteSize, concurrency);
+    } else {
+      await createDeployment(suiteId, dockerId, suiteSize, concurrency);
+    }
   }
 
   async reserveTest(suiteId: string) {
@@ -144,7 +151,8 @@ export class Logic implements ILogic {
       const suiteId = await this.startTestSuite(
         30,
         'concurrency-benchmark',
-        configuration
+        configuration,
+        false
       );
       logger.warn(
         `Benchmark run for ${configuration} finished, Suite id: ${suiteId}.`
