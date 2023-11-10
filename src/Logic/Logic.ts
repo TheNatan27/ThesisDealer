@@ -163,10 +163,11 @@ export class Logic implements ILogic {
   }
 
   async cooldown() {
-    const counter = 0;
+    let counter = 0;
     while (counter < 12) {
       await sleep(10_000);
       logger.warn(`Cooldown...  --- ${(counter + 1) * 10} second(s) passed`);
+      counter++;
     }
   }
 }
