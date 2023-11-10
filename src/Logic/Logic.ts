@@ -7,6 +7,7 @@ import {TestObjectType, testStateSchema} from '../Shared/CustomTypes';
 import GlobalConnection from '../Shared/PostgresConnector';
 import {performance} from 'perf_hooks';
 import {logger, performanceLogger} from '../Shared/Logger';
+import { sleep } from '../Shared/Utilities';
 
 export interface ILogic {
   startTestSuite(
@@ -157,6 +158,7 @@ export class Logic implements ILogic {
       logger.warn(
         `Benchmark run for ${configuration} finished, Suite id: ${suiteId}.`
       );
+      await sleep(120_000)
     }
   }
 }
