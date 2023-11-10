@@ -158,7 +158,15 @@ export class Logic implements ILogic {
       logger.warn(
         `Benchmark run for ${configuration} finished, Suite id: ${suiteId}.`
       );
-      await sleep(120_000);
+      await this.cooldown();
+    }
+  }
+
+  async cooldown() {
+    const counter = 0;
+    while (counter < 12) {
+      await sleep(10_000);
+      logger.warn(`Cooldown...  --- ${(counter + 1) * 10} second(s) passed`);
     }
   }
 }
