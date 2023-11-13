@@ -13,7 +13,6 @@ async function createDeployment(
 ) {
   dotenv.config();
   const ipAddresss = process.env.IP_ADDRESS!;
-  performanceLogger.warn({suite: suiteId}, 'Deployment started.');
 
   try {
     await execa('docker', [

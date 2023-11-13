@@ -77,6 +77,7 @@ export class Logic implements ILogic {
       vmType,
       concurrency
     );
+    performanceLogger.warn({suite: suiteId}, 'Deployment started.');
     if (parallelDeploymentEnabled) {
       createDeployment(suiteId, dockerId, suiteSize, concurrency);
     } else {
