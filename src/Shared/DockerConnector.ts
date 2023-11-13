@@ -3,7 +3,7 @@ import dotenv from 'dotenv';
 import {logger, performanceLogger} from './Logger';
 import assert from 'assert';
 import {serviceInformationSchema} from './CustomTypes';
-import { sleep } from './Utilities';
+import {sleep} from './Utilities';
 
 async function createDeployment(
   suiteId: string,
@@ -13,7 +13,7 @@ async function createDeployment(
 ) {
   dotenv.config();
   const ipAddresss = process.env.IP_ADDRESS!;
-  performanceLogger.info({suite: suiteId}, 'Deployment started.');
+  performanceLogger.warn({suite: suiteId}, 'Deployment started.');
 
   try {
     await execa('docker', [
