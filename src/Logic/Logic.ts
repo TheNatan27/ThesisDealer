@@ -54,7 +54,6 @@ export class Logic implements ILogic {
       concurrency || newTestSuiteClass.testSet.length,
       parallelDeploymentEnabled
     );
-    performanceLogger.info({suite: suiteId}, 'Deployment started.');
     return suiteId;
   }
 
