@@ -7,6 +7,7 @@ import {TestObjectType, testStateSchema} from '../Shared/CustomTypes';
 import GlobalConnection from '../Shared/PostgresConnector';
 import {performance} from 'perf_hooks';
 import {logger, performanceLogger} from '../Shared/Logger';
+import {sleep} from '../Shared/Utilities';
 
 export interface ILogic {
   startTestSuite(
@@ -156,6 +157,16 @@ export class Logic implements ILogic {
       logger.warn(
         `Benchmark run for ${configuration} finished, Suite id: ${suiteId}.`
       );
+      await this.cooldown();
+    }
+  }
+
+  async cooldown() {
+    let counter = 0;
+    while (counter < 12) {
+      await sleep(10_000);
+      logger.warn(`Cooldown...  --- ${(counter + 1) * 10} second(s) passed`);
+      counter++;
     }
     logger.warn('Concurrency benchmark done.');
     performanceLogger.warn('Concurrency benchmark done.');

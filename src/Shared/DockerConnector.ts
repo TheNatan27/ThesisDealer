@@ -3,6 +3,7 @@ import dotenv from 'dotenv';
 import {logger, performanceLogger} from './Logger';
 import assert from 'assert';
 import {serviceInformationSchema} from './CustomTypes';
+import { sleep } from './Utilities';
 
 async function createDeployment(
   suiteId: string,
@@ -85,9 +86,3 @@ async function removeServiceCommand(dockerId: string) {
   }
 }
 export {createDeployment, removeDeployment};
-
-function sleep(ms: number) {
-  return new Promise(resolve => {
-    setTimeout(resolve, ms);
-  });
-}
