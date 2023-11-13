@@ -157,5 +157,7 @@ export class Logic implements ILogic {
         `Benchmark run for ${configuration} finished, Suite id: ${suiteId}.`
       );
     }
+    logger.warn('Concurrency benchmark done.');
+    performanceLogger.warn('Concurrency benchmark done.');
   }
 }
