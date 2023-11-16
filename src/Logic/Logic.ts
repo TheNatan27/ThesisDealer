@@ -143,15 +143,13 @@ export class Logic implements ILogic {
   }
 
   async runConcurrencyBenchmark() {
-    const configurations = [
-      5, 5, 5, 10, 10, 10, 15, 15, 15, 20, 20, 20, 25, 25, 25, 30, 30, 30,
-    ];
+    const configurations = [30, 30, 30, 30, 30, 30, 30, 30, 30, 30, 30, 30];
 
     for await (const configuration of configurations) {
       logger.warn(`Benchmark run started for ${configuration}.`);
       const suiteId = await this.startTestSuite(
-        30,
-        'concurrency-benchmark',
+        3,
+        'static-benchmark',
         configuration,
         false
       );
