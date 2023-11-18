@@ -52,7 +52,7 @@ export class Logic implements ILogic {
       newTestSuiteClass.testSet.length,
       numberOfVms,
       vmType,
-      concurrency || newTestSuiteClass.testSet.length,
+      concurrency,
       parallelDeploymentEnabled
     );
     return suiteId;
@@ -64,7 +64,7 @@ export class Logic implements ILogic {
     suiteSize: number,
     numberOfVms: number,
     vmType: string,
-    concurrency: number,
+    concurrency?: number,
     parallelDeploymentEnabled = true
   ) {
     const currentDate = new Date();
