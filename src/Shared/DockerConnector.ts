@@ -1,6 +1,6 @@
 import execa from 'execa';
 import dotenv from 'dotenv';
-import {logger} from './Logger';
+import {logger, performanceLogger} from './Logger';
 import assert from 'assert';
 import {serviceInformationSchema} from './CustomTypes';
 import {sleep} from './Utilities';

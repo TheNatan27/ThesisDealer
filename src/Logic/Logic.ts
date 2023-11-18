@@ -55,7 +55,6 @@ export class Logic implements ILogic {
       concurrency,
       parallelDeploymentEnabled
     );
-    performanceLogger.info({suite: suiteId}, 'Deployment started.');
     return suiteId;
   }
 
@@ -78,6 +77,7 @@ export class Logic implements ILogic {
       vmType,
       concurrency
     );
+    performanceLogger.warn({suite: suiteId}, 'Deployment started.');
     if (parallelDeploymentEnabled) {
       createDeployment(suiteId, dockerId, suiteSize, concurrency);
     } else {
@@ -169,5 +169,7 @@ export class Logic implements ILogic {
       logger.warn(`Cooldown...  --- ${(counter + 1) * 10} second(s) passed`);
       counter++;
     }
+    logger.warn('Concurrency benchmark done.');
+    performanceLogger.warn('Concurrency benchmark done.');
   }
 }
