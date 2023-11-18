@@ -12,14 +12,14 @@ async function createDeployment(
   concurrency?: number
 ) {
   if (concurrency) {
-    createDeploymentWithDefinedConcurrency(
+    await createDeploymentWithDefinedConcurrency(
       suiteId,
       dockerId,
       suiteSize,
       concurrency
     );
   } else {
-    createDeploymentWithDefaultConcurreny(suiteId, dockerId, suiteSize);
+    await createDeploymentWithDefaultConcurreny(suiteId, dockerId, suiteSize);
   }
 }
 
