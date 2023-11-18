@@ -3,9 +3,27 @@ import dotenv from 'dotenv';
 import {logger} from './Logger';
 import assert from 'assert';
 import {serviceInformationSchema} from './CustomTypes';
-import { sleep } from './Utilities';
+import {sleep} from './Utilities';
 
 async function createDeployment(
+  suiteId: string,
+  dockerId: string,
+  suiteSize: number,
+  concurrency?: number
+) {
+  if (concurrency) {
+    createDeploymentWithDefinedConcurrency(
+      suiteId,
+      dockerId,
+      suiteSize,
+      concurrency
+    );
+  } else {
+    createDeploymentWithDefaultConcurreny(suiteId, dockerId, suiteSize);
+  }
+}
+
+async function createDeploymentWithDefinedConcurrency(
   suiteId: string,
   dockerId: string,
   suiteSize: number,
@@ -30,6 +48,36 @@ async function createDeployment(
       'replicated-job',
       '--max-concurrent',
       concurrency.toString(),
+      'merninfo/worker-image:latest',
+    ]);
+  } catch (error) {
+    logger.error(error);
+    //TODO throw deployment error
+  }
+}
+
+async function createDeploymentWithDefaultConcurreny(
+  suiteId: string,
+  dockerId: string,
+  suiteSize: number
+) {
+  dotenv.config();
+  const ipAddresss = process.env.IP_ADDRESS!;
+
+  try {
+    await execa('docker', [
+      'service',
+      'create',
+      '--env',
+      `SUITE_ID=${suiteId}`,
+      '--env',
+      `IP_ADDRESS=${ipAddresss}`,
+      '--name',
+      dockerId,
+      '--replicas',
+      suiteSize.toString(),
+      '--mode',
+      'replicated-job',
       'merninfo/worker-image:latest',
     ]);
   } catch (error) {
