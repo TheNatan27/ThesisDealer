@@ -51,7 +51,7 @@ export class DealerController {
     this.endpoint.post(
       '/run-benchmark/:vmType',
       async (request, response, next) => {
-        await this.logicLayer.runConcurrencyBenchmark(request.params.vmType);
+        await this.logicLayer.runNodeLimitationBenchmark(request.params.vmType);
         response.json({'benchmark-run': 'started'});
       }
     );
@@ -66,19 +66,19 @@ export class DealerController {
     });
 
     this.endpoint.post(
-      '/start-suite/:numberOfVms/:vmType/:concurrency?',
+      '/start-suite/:numberOfVms/:vmType/:perNodeLimitation?',
       async (request, response) => {
         const numberOfVms = parseInt(request.params.numberOfVms);
         const vmType = request.params.vmType;
-        let concurrency;
-        if (request.params.concurrency) {
-          concurrency = parseInt(request.params.concurrency);
+        let perNodeLimitation;
+        if (request.params.perNodeLimitation) {
+          perNodeLimitation = parseInt(request.params.perNodeLimitation);
         }
         response.json({
           response: this.logicLayer.startTestSuite(
             numberOfVms,
             vmType,
-            concurrency
+            perNodeLimitation
           ),
         });
       }

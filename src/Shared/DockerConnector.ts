@@ -9,25 +9,25 @@ async function createDeployment(
   suiteId: string,
   dockerId: string,
   suiteSize: number,
-  concurrency?: number
+  perNodeLimitation?: number
 ) {
-  if (concurrency) {
-    await createDeploymentWithDefinedConcurrency(
+  if (perNodeLimitation) {
+    await createLimitedDeployment(
       suiteId,
       dockerId,
       suiteSize,
-      concurrency
+      perNodeLimitation
     );
   } else {
-    await createDeploymentWithDefaultConcurreny(suiteId, dockerId, suiteSize);
+    await createDeploymentWithoutLimitation(suiteId, dockerId, suiteSize);
   }
 }
 
-async function createDeploymentWithDefinedConcurrency(
+async function createLimitedDeployment(
   suiteId: string,
   dockerId: string,
   suiteSize: number,
-  concurrency: number
+  perNodeLimitation: number
 ) {
   dotenv.config();
   const ipAddresss = process.env.IP_ADDRESS!;
@@ -47,7 +47,7 @@ async function createDeploymentWithDefinedConcurrency(
       '--mode',
       'replicated-job',
       '--replicas-max-per-node',
-      concurrency.toString(),
+      perNodeLimitation.toString(),
       'merninfo/worker-image:latest',
     ]);
   } catch (error) {
@@ -56,7 +56,7 @@ async function createDeploymentWithDefinedConcurrency(
   }
 }
 
-async function createDeploymentWithDefaultConcurreny(
+async function createDeploymentWithoutLimitation(
   suiteId: string,
   dockerId: string,
   suiteSize: number

@@ -13,12 +13,12 @@ export interface ILogic {
   startTestSuite(
     numberOfVms: number,
     vmType: string,
-    concurrency?: number
+    perNodeLimitation?: number
   ): Promise<string>;
   reserveTest(suite: string): Promise<string>;
   requestTest(suiteId: string, testId: string): Promise<string>;
   returnTest(result: string, suiteId: string, testId: string): Promise<void>;
-  runConcurrencyBenchmark(vmType: string): Promise<void>;
+  runNodeLimitationBenchmark(vmType: string): Promise<void>;
   readonly testRunRepository: Array<TestSuiteClass>;
 }
 
@@ -39,7 +39,7 @@ export class Logic implements ILogic {
   async startTestSuite(
     numberOfVms: number,
     vmType: string,
-    concurrency?: number,
+    perNodeLimitation?: number,
     parallelDeploymentEnabled = true
   ): Promise<string> {
     const suiteId = uuid();
@@ -52,7 +52,7 @@ export class Logic implements ILogic {
       newTestSuiteClass.testSet.length,
       numberOfVms,
       vmType,
-      concurrency,
+      perNodeLimitation,
       parallelDeploymentEnabled
     );
     return suiteId;
@@ -64,7 +64,7 @@ export class Logic implements ILogic {
     suiteSize: number,
     numberOfVms: number,
     vmType: string,
-    concurrency?: number,
+    perNodeLimitation?: number,
     parallelDeploymentEnabled = true
   ) {
     const currentDate = new Date();
@@ -75,13 +75,13 @@ export class Logic implements ILogic {
       suiteSize,
       numberOfVms,
       vmType,
-      concurrency
+      perNodeLimitation
     );
     performanceLogger.warn({suite: suiteId}, 'Deployment started.');
     if (parallelDeploymentEnabled) {
-      createDeployment(suiteId, dockerId, suiteSize, concurrency);
+      createDeployment(suiteId, dockerId, suiteSize, perNodeLimitation);
     } else {
-      await createDeployment(suiteId, dockerId, suiteSize, concurrency);
+      await createDeployment(suiteId, dockerId, suiteSize, perNodeLimitation);
     }
   }
 
@@ -142,8 +142,10 @@ export class Logic implements ILogic {
     return selectedSuite;
   }
 
-  async runConcurrencyBenchmark(vmType: string) {
-    const configurations = [30, 30, 30, 30, 30, 30, 30, 30, 30, 30, 30, 30];
+  async runNodeLimitationBenchmark(vmType: string) {
+    const configurations = [
+      4, 4, 4, 8, 8, 8, 12, 12, 12, 16, 16, 16, 20, 20, 20,
+    ];
 
     for await (const configuration of configurations) {
       logger.warn(`Benchmark run started for ${configuration}.`);
@@ -162,12 +164,12 @@ export class Logic implements ILogic {
 
   async cooldown() {
     let counter = 0;
-    while (counter < 12) {
+    while (counter < 6) {
       await sleep(10_000);
       logger.warn(`Cooldown...  --- ${(counter + 1) * 10} second(s) passed`);
       counter++;
     }
-    logger.warn('Concurrency benchmark done.');
-    performanceLogger.warn('Concurrency benchmark done.');
+    logger.warn('perNodeLimitation benchmark done.');
+    performanceLogger.warn('perNodeLimitation benchmark done.');
   }
 }
