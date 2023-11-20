@@ -28,7 +28,7 @@ async function createDeployment(
       suiteSize.toString(),
       '--mode',
       'replicated-job',
-      '--max-concurrent',
+      '--replicas-max-per-node',
       concurrency.toString(),
       'merninfo/worker-image:latest',
     ]);
