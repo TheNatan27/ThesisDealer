@@ -48,10 +48,13 @@ export class DealerController {
       });
     };
 
-    this.endpoint.post('/run-benchmark', async (request, response, next) => {
-      await this.logicLayer.runConcurrencyBenchmark();
-      response.json({'benchmark-run': 'started'});
-    });
+    this.endpoint.post(
+      '/run-benchmark/:vmType',
+      async (request, response, next) => {
+        await this.logicLayer.runConcurrencyBenchmark(request.params.vmType);
+        response.json({'benchmark-run': 'started'});
+      }
+    );
 
     this.endpoint.post('/initialize-db', async (request, response, next) => {
       try {
