@@ -87,7 +87,7 @@ class PostgresConnector {
     suiteSize: number,
     numberOfVms: number,
     vmType: string,
-    concurrency: number
+    concurrency = 999
   ) {
     this.connectToDb();
 
