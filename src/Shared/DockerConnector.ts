@@ -9,6 +9,24 @@ async function createDeployment(
   suiteId: string,
   dockerId: string,
   suiteSize: number,
+  concurrency?: number
+) {
+  if (concurrency) {
+    await createDeploymentWithDefinedConcurrency(
+      suiteId,
+      dockerId,
+      suiteSize,
+      concurrency
+    );
+  } else {
+    await createDeploymentWithDefaultConcurreny(suiteId, dockerId, suiteSize);
+  }
+}
+
+async function createDeploymentWithDefinedConcurrency(
+  suiteId: string,
+  dockerId: string,
+  suiteSize: number,
   concurrency: number
 ) {
   dotenv.config();
@@ -30,6 +48,36 @@ async function createDeployment(
       'replicated-job',
       '--replicas-max-per-node',
       concurrency.toString(),
+      'merninfo/worker-image:latest',
+    ]);
+  } catch (error) {
+    logger.error(error);
+    //TODO throw deployment error
+  }
+}
+
+async function createDeploymentWithDefaultConcurreny(
+  suiteId: string,
+  dockerId: string,
+  suiteSize: number
+) {
+  dotenv.config();
+  const ipAddresss = process.env.IP_ADDRESS!;
+
+  try {
+    await execa('docker', [
+      'service',
+      'create',
+      '--env',
+      `SUITE_ID=${suiteId}`,
+      '--env',
+      `IP_ADDRESS=${ipAddresss}`,
+      '--name',
+      dockerId,
+      '--replicas',
+      suiteSize.toString(),
+      '--mode',
+      'replicated-job',
       'merninfo/worker-image:latest',
     ]);
   } catch (error) {
