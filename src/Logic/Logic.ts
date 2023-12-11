@@ -52,7 +52,7 @@ export class Logic implements ILogic {
       newTestSuiteClass.testSet.length,
       numberOfVms,
       vmType,
-      concurrency || newTestSuiteClass.testSet.length,
+      concurrency,
       parallelDeploymentEnabled
     );
     return suiteId;
@@ -64,7 +64,7 @@ export class Logic implements ILogic {
     suiteSize: number,
     numberOfVms: number,
     vmType: string,
-    concurrency: number,
+    concurrency?: number,
     parallelDeploymentEnabled = true
   ) {
     const currentDate = new Date();
@@ -143,9 +143,7 @@ export class Logic implements ILogic {
   }
 
   async runConcurrencyBenchmark() {
-    const configurations = [
-      5, 5, 5, 10, 10, 10, 15, 15, 15, 20, 20, 20, 25, 25, 25, 30, 30, 30,
-    ];
+    const configurations = [10, 10, 20, 20, 30, 30, 40, 40, 50, 50, 60, 60];
 
     for await (const configuration of configurations) {
       logger.warn(`Benchmark run started for ${configuration}.`);
