@@ -30,7 +30,7 @@ async function createDeployment(
       'replicated-job',
       '--max-concurrent',
       concurrency.toString(),
-      'merninfo/worker-image:latest',
+      'merninfo/worker-image:clean',
     ]);
   } catch (error) {
     logger.error(error);
