@@ -10,7 +10,6 @@ class PostgresConnector {
     dotenv.config();
     const databaseHost = process.env.DATABASE_HOST;
     const databasePassword = process.env.POSTGRES_PASSWORD;
-    logger.info(`DB information: ${databaseHost}, ${databasePassword}`);
     this.client = new Client({
       user: 'postgres',
       password: databasePassword,
@@ -83,7 +82,6 @@ class PostgresConnector {
 
   async insertSuite(
     suiteId: string,
-    date: string,
     suiteSize: number,
     numberOfVms: number,
     vmType: string,

@@ -7,29 +7,17 @@ import {TestObjectType, testStateSchema} from '../Shared/CustomTypes';
 import GlobalConnection from '../Shared/PostgresConnector';
 import {performance} from 'perf_hooks';
 import {logger, performanceLogger} from '../Shared/Logger';
-import {sleep} from '../Shared/Utilities';
 import {trackDeployment} from './ProgressTracker';
+import {LogicInterface} from './LogicInterface';
 
-export interface ILogic {
-  startTestSuite(
-    numberOfVms: number,
-    vmType: string,
-    concurrency?: number
-  ): Promise<string>;
-  reserveTest(suite: string): Promise<string>;
-  requestTest(suiteId: string, testId: string): Promise<string>;
-  returnTest(result: string, suiteId: string, testId: string): Promise<void>;
-  runConcurrencyBenchmark(): Promise<void>;
-  readonly testRunRepository: Array<TestSuiteClass>;
-}
-
-/////////////////////////////////////////////
-
-export class Logic implements ILogic {
+export class Logic implements LogicInterface {
   readonly testRunRepository: Array<TestSuiteClass>;
 
   constructor() {
     this.testRunRepository = new Array<TestSuiteClass>();
+  }
+  runConcurrencyBenchmark(): Promise<void> {
+    throw new Error('Method not implemented.');
   }
 
   // Workflow:
@@ -40,8 +28,7 @@ export class Logic implements ILogic {
   async startTestSuite(
     numberOfVms: number,
     vmType: string,
-    concurrency?: number,
-    parallelDeploymentEnabled = true
+    concurrency?: number
   ): Promise<string> {
     const suiteId = uuid();
     const dockerId = uuid();
@@ -53,8 +40,7 @@ export class Logic implements ILogic {
       newTestSuiteClass.testSet.length,
       numberOfVms,
       vmType,
-      concurrency,
-      parallelDeploymentEnabled
+      concurrency
     );
     return suiteId;
   }
@@ -65,26 +51,18 @@ export class Logic implements ILogic {
     suiteSize: number,
     numberOfVms: number,
     vmType: string,
-    concurrency?: number,
-    parallelDeploymentEnabled = true
+    concurrency?: number
   ) {
-    const currentDate = new Date();
-    const formattedDate = currentDate.toISOString().split('T')[0];
     await GlobalConnection.getInstance().insertSuite(
       suiteId,
-      formattedDate,
       suiteSize,
       numberOfVms,
       vmType,
       concurrency
     );
     performanceLogger.warn({suite: suiteId}, 'Deployment started.');
+    createDeployment(suiteId, dockerId, suiteSize, concurrency);
     trackDeployment(dockerId);
-    if (parallelDeploymentEnabled) {
-      createDeployment(suiteId, dockerId, suiteSize, concurrency);
-    } else {
-      await createDeployment(suiteId, dockerId, suiteSize, concurrency);
-    }
   }
 
   async reserveTest(suiteId: string) {
@@ -136,44 +114,11 @@ export class Logic implements ILogic {
     );
   }
 
-  private async startTrackingSuite(suiteId: string) {
-    const selectedSuite = await this.selectTestSuite(suiteId);
-  }
-
   private async selectTestSuite(suiteId: string) {
     const selectedSuite = this.testRunRepository.find(
       suite => suite.suiteId === suiteId
     );
     assert(selectedSuite !== undefined);
     return selectedSuite;
-  }
-
-  async runConcurrencyBenchmark() {
-    const configurations = [10, 10, 20, 20, 30, 30, 40, 40, 50, 50, 60, 60];
-
-    for await (const configuration of configurations) {
-      logger.warn(`Benchmark run started for ${configuration}.`);
-      const suiteId = await this.startTestSuite(
-        30,
-        'concurrency-benchmark',
-        configuration,
-        false
-      );
-      logger.warn(
-        `Benchmark run for ${configuration} finished, Suite id: ${suiteId}.`
-      );
-      await this.cooldown();
-    }
-  }
-
-  async cooldown() {
-    let counter = 0;
-    while (counter < 12) {
-      await sleep(10_000);
-      logger.warn(`Cooldown...  --- ${(counter + 1) * 10} second(s) passed`);
-      counter++;
-    }
-    logger.warn('Concurrency benchmark done.');
-    performanceLogger.warn('Concurrency benchmark done.');
   }
 }

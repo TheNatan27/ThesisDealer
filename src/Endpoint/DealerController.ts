@@ -1,20 +1,21 @@
 import bodyParser from 'body-parser';
 import cors from 'cors';
-import express, {NextFunction, Request, Response, response} from 'express';
+import express from 'express';
 import ip from 'ip';
 import multer from 'multer';
-import {ILogic, Logic} from '../Logic/Logic';
-import {AllTestsReservedError} from '../Errors/CustomErrors';
+import {Logic} from '../Logic/Logic';
 import GlobalConnection from '../Shared/PostgresConnector';
 import {logger} from '../Shared/Logger';
 import {io} from '../Socket/socketServer';
+import {CustomErrorHandler} from './CustomErrorHandler';
+import {LogicInterface} from '../Logic/LogicInterface';
 
 export class DealerController {
   readonly endpoint = express();
   readonly backendPort: string;
   readonly backendIp: string;
   readonly upload: multer.Multer;
-  readonly logicLayer: ILogic = new Logic();
+  readonly logicLayer: LogicInterface = new Logic();
 
   constructor() {
     this.backendPort = process.env.BACKEND_PORT || '30552';
@@ -33,26 +34,7 @@ export class DealerController {
     this.endpoint.use(bodyParser.json());
     this.endpoint.use(bodyParser.urlencoded({extended: true}));
 
-    const ErrorHandler = (
-      error: Error,
-      request: Request,
-      response: Response,
-      // eslint-disable-next-line @typescript-eslint/no-unused-vars
-      next: NextFunction
-    ) => {
-      logger.error(error.name);
-      response.statusCode = 500;
-      response.json({
-        name: error.name,
-        message: error.message,
-        stack: error.stack,
-      });
-    };
-
-    this.endpoint.post('/run-benchmark', async (request, response, next) => {
-      await this.logicLayer.runConcurrencyBenchmark();
-      response.json({'benchmark-run': 'started'});
-    });
+    const ErrorHandler = CustomErrorHandler;
 
     this.endpoint.post('/initialize-db', async (request, response, next) => {
       try {
@@ -121,16 +103,10 @@ export class DealerController {
     );
 
     // DEBUG
-    this.endpoint.post('/startgame-dev', async (request, response) => {
-      //const suiteID = this.logicLayer.startTestSuite();
-      //response.json({suiteID: suiteID});
-    });
-
     this.endpoint.get('/debug/:SZOVEG', async (request, response, next) => {
       io.emit('track-deployment-debug', request.params.SZOVEG);
       response.json({debug: 'ok'});
     });
-
     // DEBUG
 
     this.endpoint.use(ErrorHandler);
