@@ -8,6 +8,7 @@ import GlobalConnection from '../Shared/PostgresConnector';
 import {performance} from 'perf_hooks';
 import {logger, performanceLogger} from '../Shared/Logger';
 import {sleep} from '../Shared/Utilities';
+import {trackDeployment} from './ProgressTracker';
 
 export interface ILogic {
   startTestSuite(
@@ -78,6 +79,7 @@ export class Logic implements ILogic {
       concurrency
     );
     performanceLogger.warn({suite: suiteId}, 'Deployment started.');
+    trackDeployment(dockerId);
     if (parallelDeploymentEnabled) {
       createDeployment(suiteId, dockerId, suiteSize, concurrency);
     } else {
@@ -132,6 +134,10 @@ export class Logic implements ILogic {
       executionTime,
       suiteId
     );
+  }
+
+  private async startTrackingSuite(suiteId: string) {
+    const selectedSuite = await this.selectTestSuite(suiteId);
   }
 
   private async selectTestSuite(suiteId: string) {

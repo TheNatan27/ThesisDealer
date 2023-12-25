@@ -2,7 +2,7 @@ import execa from 'execa';
 import dotenv from 'dotenv';
 import {logger, performanceLogger} from './Logger';
 import assert from 'assert';
-import {serviceInformationSchema} from './CustomTypes';
+import {serviceInformationSchemaStrict} from './CustomTypes';
 import {sleep} from './Utilities';
 
 async function createDeployment(
@@ -48,7 +48,7 @@ async function createDeploymentWithDefinedConcurrency(
       'replicated-job',
       '--max-concurrent',
       concurrency.toString(),
-      'merninfo/worker-image:latest',
+      'merninfo/worker-image:clean',
     ]);
   } catch (error) {
     logger.error(error);
@@ -78,7 +78,7 @@ async function createDeploymentWithDefaultConcurreny(
       suiteSize.toString(),
       '--mode',
       'replicated-job',
-      'merninfo/worker-image:latest',
+      'merninfo/worker-image:clean',
     ]);
   } catch (error) {
     logger.error(error);
@@ -102,7 +102,20 @@ async function removeDeployment(dockerId: string) {
   }
 }
 
-async function parseServiceInformation(dockerId: string) {
+export async function parseServiceInformation(dockerId: string) {
+  try {
+    const stdout = await requestServiceInformation(dockerId);
+    assert(stdout !== undefined);
+    logger.debug(`Parsed service information: ${stdout}`);
+    serviceInformationSchemaStrict.parse(JSON.parse(stdout));
+    return true;
+  } catch (error) {
+    logger.warn('Failed to parse service information.');
+    return false;
+  }
+}
+
+export async function requestServiceInformation(dockerId: string) {
   try {
     const {stdout} = await execa('docker', [
       'service',
@@ -112,12 +125,19 @@ async function parseServiceInformation(dockerId: string) {
       '--filter',
       `name=${dockerId}`,
     ]);
-    assert(stdout !== undefined);
-    logger.debug(`Parsed service information: ${stdout}`);
-    serviceInformationSchema.parse(JSON.parse(stdout));
+    return stdout;
+  } catch (error) {
+    logger.error('Failed to request service information');
+    return undefined;
+  }
+}
+
+export async function checkIfServiceExists(dockerId: string) {
+  try {
+    await execa('docker', ['service', 'ps', dockerId, '--format', 'json']);
     return true;
   } catch (error) {
-    logger.warn('Failed to parse service information.');
+    logger.error('Service no longer exists.');
     return false;
   }
 }

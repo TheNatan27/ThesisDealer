@@ -7,6 +7,7 @@ import {ILogic, Logic} from '../Logic/Logic';
 import {AllTestsReservedError} from '../Errors/CustomErrors';
 import GlobalConnection from '../Shared/PostgresConnector';
 import {logger} from '../Shared/Logger';
+import {io} from '../Socket/socketServer';
 
 export class DealerController {
   readonly endpoint = express();
@@ -126,13 +127,8 @@ export class DealerController {
     });
 
     this.endpoint.get('/debug/:SZOVEG', async (request, response, next) => {
-      logger.info('thisisthedebugendpoint');
-
-      try {
-        throw new AllTestsReservedError(request.params.SZOVEG);
-      } catch (error) {
-        next(error);
-      }
+      io.emit('track-deployment-debug', request.params.SZOVEG);
+      response.json({debug: 'ok'});
     });
 
     // DEBUG

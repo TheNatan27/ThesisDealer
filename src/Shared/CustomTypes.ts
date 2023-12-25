@@ -17,7 +17,7 @@ export const testObjectSchema = z.object({
   state: testStateSchema,
 });
 
-export const serviceInformationSchema = z.object({
+export const serviceInformationSchemaStrict = z.object({
   ID: z.string(),
   Image: z.string(),
   Mode: z.string(),
@@ -26,8 +26,21 @@ export const serviceInformationSchema = z.object({
   Replicas: z.string().regex(/0\/[0-9]+ \([0-9]+\/[0-9]+ completed\)/i),
 });
 
+export const serviceInformationSchema = z.object({
+  ID: z.string(),
+  Image: z.string(),
+  Mode: z.string(),
+  Name: z.string(),
+  Ports: z.string(),
+  Replicas: z.string(),
+});
+
 export type TestObjectType = z.infer<typeof testObjectSchema>;
 
 export type TestState = z.infer<typeof testStateSchema>;
 
-export type ServiceInformation = z.infer<typeof serviceInformationSchema>;
+export type ServiceInformationStrict = z.infer<
+  typeof serviceInformationSchemaStrict
+>;
+
+export type ServiceInformationSchema = z.infer<typeof serviceInformationSchema>;
