@@ -6,7 +6,11 @@ import {join} from 'node:path';
 
 const app = express();
 const socketServer = createServer(app);
-export const io = new Server(socketServer);
+export const io = new Server(socketServer, {
+  cors: {
+    origin: 'http://localhost:3000',
+  },
+});
 
 app.get('/', (request, response) => {
   response.sendFile(join(__dirname, '../../Pages/index.html'));
