@@ -10,15 +10,15 @@ import {
 import {sleep} from '../Shared/Utilities';
 import {logger} from '../Shared/Logger';
 
-export async function trackDeployment(dockerId: string) {
+export async function trackDeployment(dockerId: string, suiteId: string) {
   await sleep(10_000);
   let doesDeploymentExist = true;
   while (doesDeploymentExist) {
     const serviceInformation = await requestServiceInformation(dockerId);
     const parsedInformation = parseServiceInformation(serviceInformation!);
     if (parsedInformation !== null) {
-      emitTrackingData(parsedInformation, dockerId);
-      await sleep(500);
+      emitTrackingData(parsedInformation, suiteId);
+      await sleep(750);
     } else {
       doesDeploymentExist = await checkIfServiceExists(dockerId);
     }
@@ -27,14 +27,15 @@ export async function trackDeployment(dockerId: string) {
 
 function emitTrackingData(
   serviceInformation: ServiceInformationSchema,
-  dockerId: string
+  suiteId: string
 ) {
   const resultNumbers = processReplicaInformationWithRegex(
     serviceInformation.Replicas
   );
-  io.emit('track-deployment-debug', {
+  io.emit('track-deployment-status', {
     doneReplicas: resultNumbers.doneReplicas,
     allReplicas: resultNumbers.allReplicas,
+    suiteId: suiteId,
   });
 }
 

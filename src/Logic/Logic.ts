@@ -62,7 +62,7 @@ export class Logic implements LogicInterface {
     );
     performanceLogger.warn({suite: suiteId}, 'Deployment started.');
     createDeployment(suiteId, dockerId, suiteSize, concurrency);
-    trackDeployment(dockerId);
+    trackDeployment(dockerId, suiteId);
   }
 
   async reserveTest(suiteId: string) {
