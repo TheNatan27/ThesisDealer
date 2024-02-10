@@ -34,7 +34,7 @@ export class Logic implements LogicInterface {
     const dockerId = uuid();
     const newTestSuiteClass = new TestSuiteClass(suiteId, dockerId);
     this.testRunRepository.push(newTestSuiteClass);
-    await this.createSuiteInDatabase(
+    this.createSuiteInDatabase(
       suiteId,
       dockerId,
       newTestSuiteClass.testSet.length,

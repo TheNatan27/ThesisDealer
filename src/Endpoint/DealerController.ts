@@ -55,7 +55,7 @@ export class DealerController {
           concurrency = parseInt(request.params.concurrency);
         }
         response.json({
-          response: this.logicLayer.startTestSuite(
+          suiteId: await this.logicLayer.startTestSuite(
             numberOfVms,
             vmType,
             concurrency
