@@ -4,6 +4,7 @@ import {
   requestServiceInformation,
 } from '../Shared/DockerConnector';
 import {
+  DeploymentStatus,
   ServiceInformationSchema,
   serviceInformationSchema,
 } from '../Shared/CustomTypes';
@@ -11,7 +12,7 @@ import {sleep} from '../Shared/Utilities';
 import {logger} from '../Shared/Logger';
 
 export async function trackDeployment(dockerId: string, suiteId: string) {
-  await sleep(10_000);
+  await sleep(5_000);
   let doesDeploymentExist = true;
   while (doesDeploymentExist) {
     const serviceInformation = await requestServiceInformation(dockerId);
@@ -35,6 +36,7 @@ function emitTrackingData(
   io.emit('track-deployment-status', {
     doneReplicas: resultNumbers.doneReplicas,
     allReplicas: resultNumbers.allReplicas,
+    isDone: resultNumbers.isDone,
     suiteId: suiteId,
   });
 }
@@ -58,13 +60,10 @@ function processReplicaInformationWithRegex(replicaInformation: string) {
   const doneAndAllReplicas = insideParanthesis![0]
     .match(/[0-9]+\/[0-9]+/)![0]
     .split('/');
-  type DeploymentStatus = {
-    doneReplicas: number;
-    allReplicas: number;
-  };
   const deploymentStatus: DeploymentStatus = {
     doneReplicas: parseInt(doneAndAllReplicas[0]),
     allReplicas: parseInt(doneAndAllReplicas[1]),
+    isDone: parseInt(doneAndAllReplicas[0]) === parseInt(doneAndAllReplicas[1]),
   };
   return deploymentStatus;
 }

@@ -44,3 +44,9 @@ export type ServiceInformationStrict = z.infer<
 >;
 
 export type ServiceInformationSchema = z.infer<typeof serviceInformationSchema>;
+
+export type DeploymentStatus = {
+  doneReplicas: number;
+  allReplicas: number;
+  isDone: boolean;
+};
