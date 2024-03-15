@@ -1,4 +1,4 @@
-import {TestObjectType, testStateSchema} from './CustomTypes';
+import {TestObjectType, testStateSchema} from '../Types/CustomTypes';
 import fs from 'fs';
 import path from 'path';
 import {v4 as uuid} from 'uuid';

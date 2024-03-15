@@ -7,7 +7,7 @@ import {
   DeploymentStatus,
   ServiceInformationSchema,
   serviceInformationSchema,
-} from '../Shared/CustomTypes';
+} from '../Types/CustomTypes';
 import {sleep} from '../Shared/Utilities';
 import {logger} from '../Shared/Logger';
 

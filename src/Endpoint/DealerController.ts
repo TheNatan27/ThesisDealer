@@ -9,17 +9,21 @@ import {logger} from '../Shared/Logger';
 import {io} from '../Socket/socketServer';
 import {CustomErrorHandler} from './CustomErrorHandler';
 import {LogicInterface} from '../Logic/LogicInterface';
+import {ConfigurationType} from '../Types/ConfigurationSchema';
+import {validateEnvironmentVariables} from '../Configuration/Configuration';
 
 export class DealerController {
   readonly endpoint = express();
-  readonly backendPort: string;
+  readonly backendPort: number;
   readonly backendIp: string;
   readonly upload: multer.Multer;
   readonly logicLayer: LogicInterface = new Logic();
+  readonly configuration: ConfigurationType;
 
   constructor() {
-    this.backendPort = process.env.BACKEND_PORT || '30552';
-    this.backendIp = process.env.BACKEND_IP || ip.address();
+    this.configuration = validateEnvironmentVariables();
+    this.backendPort = this.configuration.backend_port;
+    this.backendIp = this.configuration.backend_ip || ip.address();
     const storage = multer.diskStorage({
       destination(req, file, callback) {
         callback(null, './result-files');

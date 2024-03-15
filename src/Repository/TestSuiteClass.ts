@@ -1,6 +1,6 @@
 import assert from 'assert';
 import {createTestSet, processResults} from '../Shared/Utilities';
-import {TestObjectType, testStateSchema} from '../Shared/CustomTypes';
+import {TestObjectType, testStateSchema} from '../Types/CustomTypes';
 import {AllTestsReservedError} from '../Errors/CustomErrors';
 import {performance} from 'perf_hooks';
 import {logger} from '../Shared/Logger';

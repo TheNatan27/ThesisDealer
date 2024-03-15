@@ -1,9 +1,9 @@
 import execa from 'execa';
-import dotenv from 'dotenv';
-import {logger, performanceLogger} from './Logger';
+import {logger} from './Logger';
 import assert from 'assert';
-import {serviceInformationSchemaStrict} from './CustomTypes';
+import {serviceInformationSchemaStrict} from '../Types/CustomTypes';
 import {sleep} from './Utilities';
+import {validateEnvironmentVariables} from '../Configuration/Configuration';
 
 async function createDeployment(
   suiteId: string,
@@ -29,8 +29,7 @@ async function createDeploymentWithDefinedConcurrency(
   suiteSize: number,
   concurrency: number
 ) {
-  dotenv.config();
-  const ipAddresss = process.env.IP_ADDRESS!;
+  const ipAddress = validateEnvironmentVariables().ip_address;
 
   try {
     await execa('docker', [
@@ -39,7 +38,7 @@ async function createDeploymentWithDefinedConcurrency(
       '--env',
       `SUITE_ID=${suiteId}`,
       '--env',
-      `IP_ADDRESS=${ipAddresss}`,
+      `IP_ADDRESS=${ipAddress}`,
       '--name',
       dockerId,
       '--replicas',
@@ -61,8 +60,7 @@ async function createDeploymentWithDefaultConcurreny(
   dockerId: string,
   suiteSize: number
 ) {
-  dotenv.config();
-  const ipAddresss = process.env.IP_ADDRESS!;
+  const ipAddress = validateEnvironmentVariables().ip_address;
 
   try {
     await execa('docker', [
@@ -71,7 +69,7 @@ async function createDeploymentWithDefaultConcurreny(
       '--env',
       `SUITE_ID=${suiteId}`,
       '--env',
-      `IP_ADDRESS=${ipAddresss}`,
+      `IP_ADDRESS=${ipAddress}`,
       '--name',
       dockerId,
       '--replicas',

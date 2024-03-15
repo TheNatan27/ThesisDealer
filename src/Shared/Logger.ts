@@ -1,10 +1,13 @@
-import pino, {destination} from 'pino';
-import dotenv from 'dotenv';
+import pino from 'pino';
+import {validateEnvironmentVariables} from '../Configuration/Configuration';
+import path from 'path';
 
-dotenv.config();
-const logfolder = process.env.LOG_FOLDER || `${__dirname}\\dealer.log`;
-const performanceLogFolder =
-  process.env.PERFORMANCE_FOLDER || `${__dirname}\\performance.log`;
+const configuration = validateEnvironmentVariables();
+const logfolder = path.join(configuration.log_folder, '\\dealer.log');
+const performanceLogFolder = path.join(
+  configuration.log_folder,
+  '\\performance.log'
+);
 
 const fileTransport = pino.transport({
   targets: [

@@ -3,7 +3,7 @@ import {TestSuiteClass} from '../Repository/TestSuiteClass';
 import {v4 as uuid} from 'uuid';
 import assert from 'assert';
 import {createDeployment, removeDeployment} from '../Shared/DockerConnector';
-import {TestObjectType, testStateSchema} from '../Shared/CustomTypes';
+import {TestObjectType, testStateSchema} from '../Types/CustomTypes';
 import GlobalConnection from '../Shared/PostgresConnector';
 import {performance} from 'perf_hooks';
 import {logger, performanceLogger} from '../Shared/Logger';
