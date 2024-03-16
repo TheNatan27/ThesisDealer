@@ -19,12 +19,13 @@ async function uploadResult(processedResult: TestObjectType) {
   );
 }
 
-export function createTestSet(suiteID: string, currentFiles: string[]) {
+export function createTestSet(suiteID: string, fileStorageFolder: string) {
+  const currentFiles = gatherTestFiles(fileStorageFolder);
   return currentFiles.map(
     file =>
       ({
         name: file,
-        script: readTestFile(file),
+        script: readTestFile(fileStorageFolder, file),
         test_id: uuid(),
         state: testStateSchema.Enum.Ready,
         result: null,
@@ -38,10 +39,9 @@ export function gatherTestFiles(fileStorageFolder: string) {
   return fs.readdirSync(fileStorageFolder);
 }
 
-function readTestFile(fileName: string) {
+function readTestFile(fileStorageFolder: string, fileName: string) {
   try {
-    const data = path.join(__dirname, `../../testfile-storage/${fileName}`);
-    return data;
+    return path.join(fileStorageFolder, fileName);
   } catch (error) {
     logger.error(error);
     throw error;

@@ -19,7 +19,7 @@ export class TestSuiteClass {
     this.startTime = performance.now();
     this.suiteId = suiteId;
     this.dockerId = dockerId;
-    this.testSet = createTestSet(suiteId, gatherTestFiles(fileStorageFolder));
+    this.testSet = createTestSet(suiteId, fileStorageFolder);
   }
 
   async reserveTestId() {
