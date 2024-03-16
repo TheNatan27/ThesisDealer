@@ -1,19 +1,54 @@
-import {InvalidConfigurationError} from '../Errors/InvalidConfigurationError';
-import {configurationSchema} from '../Types/ConfigurationSchema';
+import path from 'path';
+import {EnvVariableType, envVariableSchema} from '../Types/EnvVariableType';
+import 'dotenv/config';
 
-export function validateEnvironmentVariables() {
-  try {
-    const postgresConfiguration = configurationSchema.parse(process.env);
+class Configuration {
+  envVariables: EnvVariableType;
+
+  rootFolder: string;
+  srcFolder: string;
+  mockFolder: string;
+  testfileStorageFolder: string;
+
+  constructor() {
+    this.envVariables = this.validateEnvironmentVariables();
+    this.rootFolder = path.join(this.envVariables.ROOT_FOLDER);
+    this.srcFolder = path.join(this.rootFolder, 'src');
+    this.mockFolder = path.join(this.rootFolder, 'mock');
+    this.testfileStorageFolder = path.join(this.rootFolder, 'testfile-storage');
     console.log(
-      `Postgres configuration: \n ${JSON.stringify(
-        postgresConfiguration,
+      `Paths: \n ${JSON.stringify(
+        {
+          root: this.rootFolder,
+          src: this.srcFolder,
+          mock: this.mockFolder,
+          storage: this.testfileStorageFolder,
+        },
         null,
         3
       )}`
     );
-    return postgresConfiguration;
-  } catch (error) {
-    console.error('Invalid or missing environment variables provided');
-    throw new InvalidConfigurationError();
+  }
+  private validateEnvironmentVariables() {
+    const envVariables = envVariableSchema.parse(process.env);
+    console.log(
+      `Environment variables: \n ${JSON.stringify(envVariables, null, 3)}`
+    );
+    return envVariables;
   }
 }
+
+class GlobalConfiguration {
+  private static _configuration: Configuration;
+  private constructor() {}
+
+  static getConfiguration() {
+    if (this._configuration) {
+      return this._configuration;
+    }
+    this._configuration = new Configuration();
+    return this._configuration;
+  }
+}
+
+export default GlobalConfiguration;

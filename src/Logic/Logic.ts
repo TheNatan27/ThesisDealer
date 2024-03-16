@@ -9,10 +9,11 @@ import {performance} from 'perf_hooks';
 import {logger, performanceLogger} from '../Shared/Logger';
 import {trackDeployment} from './ProgressTracker';
 import {LogicInterface} from './LogicInterface';
+import path from 'path';
+import GlobalConfiguration from '../Configuration/Configuration';
 
 export class Logic implements LogicInterface {
   readonly testRunRepository: Array<TestSuiteClass>;
-
   constructor() {
     this.testRunRepository = new Array<TestSuiteClass>();
   }
@@ -32,7 +33,11 @@ export class Logic implements LogicInterface {
   ): Promise<string> {
     const suiteId = uuid();
     const dockerId = uuid();
-    const newTestSuiteClass = new TestSuiteClass(suiteId, dockerId);
+    const newTestSuiteClass = new TestSuiteClass(
+      suiteId,
+      dockerId,
+      GlobalConfiguration.getConfiguration().testfileStorageFolder
+    );
     this.testRunRepository.push(newTestSuiteClass);
     this.createSuiteInDatabase(
       suiteId,

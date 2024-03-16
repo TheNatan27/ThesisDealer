@@ -1,12 +1,15 @@
 import pino from 'pino';
-import {validateEnvironmentVariables} from '../Configuration/Configuration';
 import path from 'path';
+import GlobalConfiguration from '../Configuration/Configuration';
 
-const configuration = validateEnvironmentVariables();
-const logfolder = path.join(configuration.log_folder, '\\dealer.log');
+const configuration = GlobalConfiguration.getConfiguration();
+const logfolder = path.join(
+  configuration.envVariables.LOG_FOLDER,
+  'dealer.log'
+);
 const performanceLogFolder = path.join(
-  configuration.log_folder,
-  '\\performance.log'
+  configuration.envVariables.LOG_FOLDER,
+  'performance.log'
 );
 
 const fileTransport = pino.transport({

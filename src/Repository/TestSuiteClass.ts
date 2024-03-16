@@ -1,5 +1,9 @@
 import assert from 'assert';
-import {createTestSet, processResults} from '../Shared/Utilities';
+import {
+  createTestSet,
+  gatherTestFiles,
+  processResults,
+} from '../Shared/Utilities';
 import {TestObjectType, testStateSchema} from '../Types/CustomTypes';
 import {AllTestsReservedError} from '../Errors/CustomErrors';
 import {performance} from 'perf_hooks';
@@ -11,11 +15,11 @@ export class TestSuiteClass {
   readonly testSet: TestObjectType[];
   readonly startTime: number;
 
-  constructor(suiteId: string, dockerId: string) {
+  constructor(suiteId: string, dockerId: string, fileStorageFolder: string) {
     this.startTime = performance.now();
     this.suiteId = suiteId;
     this.dockerId = dockerId;
-    this.testSet = createTestSet(suiteId);
+    this.testSet = createTestSet(suiteId, gatherTestFiles(fileStorageFolder));
   }
 
   async reserveTestId() {

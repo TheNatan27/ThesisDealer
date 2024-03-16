@@ -3,7 +3,7 @@ import {logger} from './Logger';
 import assert from 'assert';
 import {serviceInformationSchemaStrict} from '../Types/CustomTypes';
 import {sleep} from './Utilities';
-import {validateEnvironmentVariables} from '../Configuration/Configuration';
+import GlobalConfiguration from '../Configuration/Configuration';
 
 async function createDeployment(
   suiteId: string,
@@ -29,7 +29,8 @@ async function createDeploymentWithDefinedConcurrency(
   suiteSize: number,
   concurrency: number
 ) {
-  const ipAddress = validateEnvironmentVariables().ip_address;
+  const ipAddress =
+    GlobalConfiguration.getConfiguration().envVariables.IP_ADDRESS;
 
   try {
     await execa('docker', [
@@ -60,7 +61,8 @@ async function createDeploymentWithDefaultConcurreny(
   dockerId: string,
   suiteSize: number
 ) {
-  const ipAddress = validateEnvironmentVariables().ip_address;
+  const ipAddress =
+    GlobalConfiguration.getConfiguration().envVariables.IP_ADDRESS;
 
   try {
     await execa('docker', [

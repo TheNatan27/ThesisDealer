@@ -19,8 +19,7 @@ async function uploadResult(processedResult: TestObjectType) {
   );
 }
 
-export function createTestSet(suiteID: string) {
-  const currentFiles = gatherTestFiles();
+export function createTestSet(suiteID: string, currentFiles: string[]) {
   return currentFiles.map(
     file =>
       ({
@@ -34,8 +33,9 @@ export function createTestSet(suiteID: string) {
   );
 }
 
-function gatherTestFiles() {
-  return fs.readdirSync(path.join(__dirname, '../../testfile-storage'));
+export function gatherTestFiles(fileStorageFolder: string) {
+  console.log(fileStorageFolder);
+  return fs.readdirSync(fileStorageFolder);
 }
 
 function readTestFile(fileName: string) {

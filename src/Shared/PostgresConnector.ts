@@ -1,20 +1,18 @@
 import {Client} from 'ts-postgres';
 import {logger} from './Logger';
-import {ConfigurationType} from '../Types/ConfigurationSchema';
-import {validateEnvironmentVariables} from '../Configuration/Configuration';
+import GlobalConfiguration from '../Configuration/Configuration';
 
 class PostgresConnector {
   private client: Client;
   private isConnected: boolean;
-  private configuration: ConfigurationType;
 
   constructor() {
-    this.configuration = validateEnvironmentVariables();
     this.client = new Client({
       user: 'postgres',
-      password: this.configuration.postgres_password,
+      password:
+        GlobalConfiguration.getConfiguration().envVariables.POSTGRES_PASSWORD,
       database: 'postgres',
-      host: this.configuration.database_host,
+      host: GlobalConfiguration.getConfiguration().envVariables.DATABASE_HOST,
     });
     this.isConnected = false;
   }

@@ -5,15 +5,23 @@
     "node": ">=16"
   },
   "devDependencies": {
+    "@babel/core": "^7.24.0",
+    "@babel/preset-env": "^7.24.0",
+    "@babel/preset-typescript": "^7.23.3",
     "@playwright/test": "^1.36.1",
     "@types/cors": "^2.8.13",
     "@types/express-fileupload": "^1.4.1",
     "@types/ip": "^1.1.0",
+    "@types/jest": "^29.5.12",
     "@types/multer": "^1.4.7",
     "@types/node": "^14.11.2",
     "@types/uuid": "^9.0.2",
+    "babel-jest": "^29.7.0",
     "gts": "^3.1.1",
+    "jest": "^29.7.0",
     "nodemon": "^3.0.1",
+    "ts-jest": "^29.1.2",
+    "ts-node": "^10.9.2",
     "typescript": "~4.7.0"
   },
   "scripts": {
@@ -21,7 +29,8 @@
     "clean": "gts clean",
     "compile": "tsc",
     "fix": "gts fix",
-    "serve": "npm run compile && node ./build/index.js"
+    "serve": "npm run compile && node ./build/index.js",
+    "test": "jest"
   },
   "dependencies": {
     "@types/express": "^4.17.17",

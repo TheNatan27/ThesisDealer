@@ -3,3 +3,5 @@ build
 .env
 SQL.txt
 docker-compose.yaml.pass
+Logs
+coverage
